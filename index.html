@@ -264,6 +264,103 @@
     .feat.flip .visual{order:-1;}
     .phone{width:180px;height:380px;}
   }
+
+  /* ============================================================
+     SECTION SEAM FADES
+     Soften the hard cut between dark (#0c0b14) and light (#f5f3ef)
+     sections with a subtle gradient. A pseudo-element sits behind
+     the content (z-index:-1) and fades the ink colour out across
+     ~90px at the top & bottom edges of every light section.
+     `isolation:isolate` guarantees the needed stacking context
+     without disturbing the sticky positioning of the stages.
+     ============================================================ */
+  .stage.light{ isolation:isolate; }
+  #usecases{ position:relative; isolation:isolate; }
+  .stage.light::before, .stage.light::after,
+  #usecases::before,    #usecases::after{
+    content:''; position:absolute; inset-inline:0; height:90px; pointer-events:none; z-index:-1;
+  }
+  .stage.light::before, #usecases::before{ top:0;    background:linear-gradient(180deg, var(--ink), transparent); }
+  .stage.light::after,  #usecases::after{  bottom:0; background:linear-gradient(0deg,   var(--ink), transparent); }
+
+  /* ============================================================
+     MOBILE-FIRST REFINEMENTS  (≤ 780px)
+     ============================================================ */
+  @media(max-width:780px){
+
+    /* -- (3) Animations: quicker reveals + minimal stagger so the
+          screen is never blank during a fast scroll (max delay 0.15s) -- */
+    .rv{ transition-duration:.4s !important; }
+    .rv.d1{ transition-delay:.04s !important; }
+    .rv.d2{ transition-delay:.08s !important; }
+    .rv.d3{ transition-delay:.12s !important; }
+    .rv.d4{ transition-delay:.15s !important; }
+
+    /* -- (5) Tighter vertical rhythm: shorter sticky heights + less
+          padding = far less empty scrolling between beats -- */
+    #problem{ height:210vh !important; }
+    #persona{ height:190vh !important; }
+    #spark{   height:150vh !important; }
+    #intro{   height:130vh !important; }
+    #whatsapp{height:160vh !important; }
+    #pulse{   height:175vh !important; }
+    #wallet{  height:150vh !important; }
+    #usecases{ padding:8vh 0 10vh !important; }
+    #growth .stage{ padding:9vh 0 8vh !important; }
+
+    /* -- (1) #usecases → native horizontal carousel, all cards open -- */
+    #usecases .ucwrap{ padding:0 16px; }
+    #usecases .ufeed{
+      flex-direction:row; flex-wrap:nowrap;
+      overflow-x:auto; overflow-y:visible;
+      scroll-snap-type:x mandatory;
+      gap:14px; margin-top:5vh; padding:4px 4px 14px;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    #usecases .ufeed::-webkit-scrollbar{ display:none; }
+    #usecases .uc{
+      flex:0 0 85vw; scroll-snap-align:center;
+      /* force the resting (expanded) state — JS no longer toggles .active here */
+      transform:none !important; opacity:1 !important; filter:none !important;
+      box-shadow:0 16px 40px -26px rgba(60,58,140,.4); border-color:var(--violet-2);
+    }
+    #usecases .uc .more{ max-height:none !important; opacity:1 !important; margin-top:16px !important; }
+    #usecases .uc .more p{ line-height:2; }
+
+    /* -- (2) #patterns → native horizontal scroll (no scroll-jacking) -- */
+    #patterns{ height:auto !important; }
+    #patterns .stage{
+      position:relative !important; height:auto !important; min-height:auto !important;
+      display:block !important; overflow:visible !important; padding:8vh 0 4vh !important;
+    }
+    #patterns .stage > div:first-of-type{ position:static !important; margin-bottom:18px; }   /* heading */
+    #patterns .stage > div:nth-of-type(2){ position:static !important; transform:none !important; } /* track wrapper */
+    #patterns .track{
+      transform:none !important;
+      overflow-x:auto; scroll-snap-type:x mandatory;
+      gap:14px; padding:0 7vw 8px;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    #patterns .track::-webkit-scrollbar{ display:none; }
+    #patterns .pcard{ scroll-snap-align:center; min-height:auto; }
+    #patterns .hint{ position:static !important; margin-top:14px; }
+
+    /* -- (4) #problem bubbles: pin to the very edges and drop their
+          opacity so they never compete with the headline -- */
+    #problem.lit .bubble{ opacity:.15 !important; }
+    #problem .bubble:nth-child(1){ top:7% !important;  inset-inline-start:1% !important; }
+    #problem .bubble:nth-child(2){ top:19% !important; inset-inline-end:1% !important; }
+    #problem .bubble:nth-child(3){ top:73% !important; inset-inline-start:1% !important; }
+    #problem .bubble:nth-child(4){ top:84% !important; inset-inline-end:1% !important; }
+    #problem .bubble:nth-child(5){ top:50% !important; inset-inline-start:1% !important; }
+    #problem .bubble:nth-child(6){ top:5% !important;  inset-inline-end:2% !important; }
+
+    /* -- (5b) #events: pull the six tool cards into one tight group -- */
+    #events .stage{ padding:8vh 0 6vh !important; }
+    #events .erow{ grid-template-columns:1fr 1fr !important; gap:10px !important; }
+    #events .etypes{ gap:10px !important; }
+    #events div[style*="margin:30px 0 14px"]{ margin:16px 0 10px !important; } /* ②③ step spacers */
+  }
 </style>
 </head>
 <body>
@@ -491,31 +588,31 @@
     </div>
     <div class="ufeed">
       <div class="uc"><div class="uhead"><div class="uic">♥</div><div><h4>المنظّمات غير الربحيّة</h4><div class="utag">جمعيّات خيريّة ومؤسّسات أهليّة</div></div></div>
-        <div class="more"><p>تعتمدون على المتطوّعين والمتبرّعين، لكن التواصل مبعثر ورسائلكم تضيع وتفاعلهم يبرد. محور تُبقيكم على صلة دائمة — حملات ونشرات ودعوات تصل فعلاً وتُقرأ، مع قياس الأثر وتوثيق المشاركة.</p>
+        <div class="more"><p>• تواصل دائم مع المتطوّعين والمتبرّعين<br>• حملات ونشرات ودعوات تصل فعلاً وتُقرأ<br>• قياس الأثر وتوثيق المشاركة</p>
           <div class="toolrow"><span class="tool"><span class="ti">📣</span>حملات واتساب + بريد</span><span class="tool"><span class="ti">🎟️</span>دعوات الفعاليّات</span><span class="tool"><span class="ti">📰</span>نشرات الأثر</span><span class="tool"><span class="ti">📊</span>قياس التفاعل</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">★</div><div><h4>الأندية الطلابيّة والجامعيّة</h4><div class="utag">مجتمع نشِط رغم تغيّر الأعضاء</div></div></div>
-        <div class="more"><p>الأندية تنبض بالنشاط، لكن الأعضاء يتغيّرون كل فصل والتواصل يعتمد على قروب يضيع فيه كل شيء. محور تمنح ناديكم مساحة منظّمة: تسجيل أعضاء، فعاليّات وورش، إعلانات فوريّة، ونشرة تُبقي الطلاب متّصلين.</p>
+        <div class="more"><p>• مساحة منظّمة رغم تغيّر الأعضاء كل فصل<br>• تسجيل أعضاء وفعاليّات وورش<br>• إعلانات فوريّة ونشرة تُبقي الطلاب متّصلين</p>
           <div class="toolrow"><span class="tool"><span class="ti">📝</span>تسجيل الأعضاء</span><span class="tool"><span class="ti">🎓</span>فعاليّات وورش</span><span class="tool"><span class="ti">📢</span>إعلانات فوريّة</span><span class="tool"><span class="ti">📬</span>نشرة النادي</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">⬡</div><div><h4>مجتمعات الشركات والعلامات</h4><div class="utag">حوّل المهتمّين إلى مجتمع تملكه</div></div></div>
-        <div class="more"><p>جمهوركم المهتمّ بالعلامة مبعثر بين إنستغرام وقروب واتساب وقائمة بريد قديمة — لا تملكون أيّاً منها فعلاً. محور تحفظ جمهوركم في مكان واحد تملكونه، وتوصلكم به بالأخبار والتحديثات والعروض.</p>
+        <div class="more"><p>• جمهورك في مكان واحد تملكه فعلاً<br>• بديل عن تشتّت إنستغرام وقروبات واتساب<br>• أخبار وتحديثات وعروض تصل مباشرة</p>
           <div class="toolrow"><span class="tool"><span class="ti">👥</span>قائمة جمهور محفوظة</span><span class="tool"><span class="ti">📰</span>نشرات دوريّة</span><span class="tool"><span class="ti">🎁</span>أخبار وعروض</span><span class="tool"><span class="ti">🎯</span>شرائح مستهدفة</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">◈</div><div><h4>المجتمعات المهنيّة المتخصّصة</h4><div class="utag">تجمّعات الممارسين والخبراء</div></div></div>
-        <div class="more"><p>تجمعون ممارسين وخبراء يبحثون عن المعرفة والفرص، وربّما تديرون برامج تدريب ودفعات — لكن النقاش يتشتّت واللقاءات تُدار يدويّاً. محور تنظّم مجتمعكم المهني: عضويّات، لقاءات وورش، دفعات تدريبيّة بجداولها، وشهادات حضور وإتمام موثّقة.</p>
+        <div class="more"><p>• عضويّات منظّمة للممارسين والخبراء<br>• لقاءات وورش ودفعات تدريبيّة بجداولها<br>• شهادات حضور وإتمام موثّقة</p>
           <div class="toolrow"><span class="tool"><span class="ti">🎫</span>عضويّات منظّمة</span><span class="tool"><span class="ti">🎓</span>لقاءات وورش</span><span class="tool"><span class="ti">📚</span>دفعات تدريبيّة</span><span class="tool"><span class="ti">🏅</span>شهادات إتمام</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">⬣</div><div><h4>المجالس الأسريّة والروابط</h4><div class="utag">تواصل منظّم للعوائل الكبيرة</div></div></div>
-        <div class="more"><p>العوائل الكبيرة والروابط تحتاج تواصلاً منظّماً — مناسبات، أخبار، وصناديق عائليّة — يضيع كلّه في قروبات متفرّقة. محور تمنح رابطتكم مساحة خاصّة: دعوات المناسبات، نشرة العائلة، وتسجيل منظّم للأفراد.</p>
+        <div class="more"><p>• مساحة خاصّة بعيداً عن فوضى القروبات<br>• دعوات المناسبات ونشرة العائلة<br>• تسجيل منظّم للأفراد</p>
           <div class="toolrow"><span class="tool"><span class="ti">🎉</span>دعوات المناسبات</span><span class="tool"><span class="ti">📬</span>نشرة العائلة</span><span class="tool"><span class="ti">📒</span>سجلّ الأفراد</span><span class="tool"><span class="ti">🔔</span>إعلانات خاصّة</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">◇</div><div><h4>الديوانيّات والمبادرات المحليّة</h4><div class="utag">مجالس ثقافيّة واجتماعيّة دوريّة</div></div></div>
-        <div class="more"><p>الديوانيّات والمبادرات تلتقي بانتظام وتعتمد على الحضور والتفاعل، لكن الدعوة والتذكير والمتابعة عبء يدويّ. محور تؤتمت اللقاء الدوري: دعوة، تأكيد حضور، تذكير، وأرشيف لما يُطرح في كل جلسة.</p>
+        <div class="more"><p>• أتمتة اللقاء الدوري من الدعوة للمتابعة<br>• تأكيد حضور وتذكيرات آليّة<br>• أرشيف لما يُطرح في كل جلسة</p>
           <div class="toolrow"><span class="tool"><span class="ti">🗓️</span>لقاءات دوريّة</span><span class="tool"><span class="ti">✅</span>تأكيد حضور</span><span class="tool"><span class="ti">⏰</span>تذكيرات آليّة</span><span class="tool"><span class="ti">📁</span>أرشيف الجلسات</span></div></div>
       </div>
       <div class="uc"><div class="uhead"><div class="uic">✦</div><div><h4>المجموعات والهوايات المستقلّة</h4><div class="utag">تجمّعات حرّة حول شغف مشترك</div></div></div>
-        <div class="more"><p>تجمعكم هواية أو شغف — رياضة، فنّ، قراءة — بلا كيان رسميّ، فقط مجموعة تريد أن تنظّم لقاءاتها وتنمو. محور تمنحكم البساطة: صفحة للمجموعة، تسجيل، فعاليّات، وتواصل يُبقي الجميع على الموعد.</p>
+        <div class="more"><p>• صفحة للمجموعة وتسجيل سريع<br>• لقاءات وأنشطة حول شغف مشترك<br>• تذكيرات تُبقي الجميع على الموعد</p>
           <div class="toolrow"><span class="tool"><span class="ti">🌐</span>صفحة المجموعة</span><span class="tool"><span class="ti">⚡</span>تسجيل سريع</span><span class="tool"><span class="ti">🎯</span>لقاءات وأنشطة</span><span class="tool"><span class="ti">⏰</span>تذكيرات الموعد</span></div></div>
       </div>
     </div>
@@ -662,17 +759,32 @@
   // progress rail + brand
   const rail = document.getElementById('rail');
   const brand = document.getElementById('brand');
+  // Mobile breakpoint — used to disable scroll-jacking on small screens
+  const mqMobile = window.matchMedia('(max-width:780px)');
+  const isMobile = () => mqMobile.matches;
+  const finale = document.getElementById('finale');
   function onScroll(){
     const h = document.documentElement.scrollHeight - innerHeight;
     const p = Math.min(1, scrollY / h);
     rail.style.width = (p*100)+'%';
     brand.classList.toggle('show', scrollY > innerHeight*0.6);
-    var sc=document.getElementById('stickyCta'); if(sc){ var on=scrollY>innerHeight*1.4 && scrollY < (document.documentElement.scrollHeight-innerHeight*1.6); sc.style.opacity=on?'1':'0'; sc.style.pointerEvents=on?'auto':'none'; sc.style.transform='translateX(-50%) translateY('+(on?0:24)+'px)'; }
+    // Sticky CTA: visible after the hero, but fully hidden once the finale
+    // section enters view — avoids two join-CTAs sharing one screen.
+    var sc=document.getElementById('stickyCta');
+    if(sc){
+      var finaleReached = finale && finale.getBoundingClientRect().top < innerHeight*0.9;
+      var on = scrollY>innerHeight*1.4 && !finaleReached;
+      sc.style.opacity=on?'1':'0';
+      sc.style.pointerEvents=on?'auto':'none';
+      sc.style.transform='translateX(-50%) translateY('+(on?0:24)+'px)';
+    }
     drivePatterns();
     driveUsecases();
   }
   addEventListener('scroll', onScroll, {passive:true});
   addEventListener('resize', onScroll);
+  // Re-run when crossing the mobile breakpoint so the patterns track resets
+  mqMobile.addEventListener('change', onScroll);
 
   // reveal observer
   const io = new IntersectionObserver((entries)=>{
@@ -692,12 +804,18 @@
   const track = document.getElementById('ptrack');
   const ucards = [...document.querySelectorAll('.uc')];
   function driveUsecases(){
+    // On mobile the use-cases are a native horizontal carousel with all
+    // cards fully expanded (see CSS) — skip the scroll-driven active toggle.
+    if(isMobile()) return;
     const cy = innerHeight/2;
     let best=null, bestD=1e9;
     ucards.forEach(c=>{ const r=c.getBoundingClientRect(); const d=Math.abs((r.top+r.bottom)/2 - cy); if(d<bestD){bestD=d; best=c;} });
     ucards.forEach(c=> c.classList.toggle('active', c===best && bestD < innerHeight*0.55));
   }
   function drivePatterns(){
+    // On mobile the patterns track scrolls natively (CSS scroll-snap) —
+    // disable scroll-jacking and clear any inline transform left from desktop.
+    if(isMobile()){ track.style.transform=''; return; }
     const rect = patterns.getBoundingClientRect();
     const total = patterns.offsetHeight - innerHeight;
     const passed = Math.min(Math.max(-rect.top,0), total);
