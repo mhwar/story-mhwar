@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محور · كُن أنت المِحور</title>
+<meta name="description" content="مجتمعك يدور حولك. منصّة واحدة تنظّم جمهورك، تدير فعالياتك، وتوصل رسائلك بوضوح — وتقضي على الفوضى.">
+<meta name="theme-color" content="#08070f">
+<meta property="og:title" content="محور · كُن أنت المِحور">
+<meta property="og:description" content="بنيت جمهوراً وفقدته في الضجيج؟ محور يعيد لك السيطرة — جمهورك، فعالياتك، ورسائلك في محورٍ واحد.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mhwar.github.io/story-mhwar/v3.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#08070f; --ink-2:#0f0d1a; --card:#14121f;
+    --paper:#f5f3ef; --paper-2:#fbfaf7;
+    --muted:#8e8b9c; --line:rgba(255,255,255,.10);
+    --violet:#6c5ce7; --violet-2:#a29bfe; --grad-a:#7b6cf6; --grad-b:#e879b9;
+    --green:#22c79a; --amber:#f6b948;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink); color:#fff;
+    font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  ::selection{background:var(--violet); color:#fff;}
+  a{color:inherit; text-decoration:none;}
+
+  /* type */
+  h1,h2{font-weight:600; line-height:1.1; letter-spacing:-.4px;}
+  .display{font-size:clamp(38px,9vw,86px);}
+  .big{font-size:clamp(30px,6.4vw,60px);}
+  .lede{font-size:clamp(16px,2.3vw,21px); color:#c9c6d6; line-height:1.8; font-weight:300;}
+  .grad{background:linear-gradient(118deg,var(--grad-a),var(--grad-b)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+
+  /* scroll progress */
+  #prog{position:fixed; top:0; inset-inline-start:0; height:3px; width:0; z-index:100;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b)); box-shadow:0 0 12px rgba(123,108,246,.6);}
+
+  /* generic scene + reveal */
+  .scene{position:relative; min-height:100svh; display:flex; align-items:center; overflow:hidden; padding:14vh 0;}
+  .wrap{width:100%; max-width:1000px; margin:0 auto; padding:0 26px; position:relative; z-index:2;}
+  .rv{opacity:0; transform:translateY(30px); transition:opacity 1s cubic-bezier(.16,.7,.2,1), transform 1s cubic-bezier(.16,.7,.2,1);}
+  .rv.in{opacity:1; transform:none;}
+  .d1{transition-delay:.08s;} .d2{transition-delay:.16s;} .d3{transition-delay:.24s;} .d4{transition-delay:.34s;}
+
+  /* ============ CINEMATIC ACT (hook → enemy → reveal) ============ */
+  #act{position:relative; height:380vh; background:var(--ink);}
+  #act .stage{position:sticky; top:0; height:100svh; overflow:hidden; display:grid; place-items:center;}
+
+  /* the orb (محور) */
+  .orbWrap{position:absolute; inset-inline-start:50%; top:50%; transform:translate(-50%,-50%); z-index:3; width:220px; height:220px; will-change:transform;}
+  .orb{position:absolute; inset:0; border-radius:50%; display:grid; place-items:center;}
+  .orb .halo{position:absolute; inset:-60% ; border-radius:50%; will-change:transform,opacity;
+    background:radial-gradient(circle, rgba(123,108,246,.55), rgba(232,121,185,.22) 45%, transparent 70%); filter:blur(18px);}
+  .orb .disc{position:absolute; inset:18%; border-radius:50%;
+    background:radial-gradient(circle at 38% 32%, rgba(255,255,255,.9), var(--violet-2) 30%, var(--violet) 62%, #4a3fb0 100%);
+    box-shadow:0 0 60px -6px rgba(123,108,246,.7), inset 0 -10px 30px rgba(0,0,0,.35);}
+  .orb .ring{position:absolute; border-radius:50%; border:1px solid rgba(255,255,255,.12);}
+  .orb .ring.r1{inset:-6%;} .orb .ring.r2{inset:-26%; border-color:rgba(162,155,254,.18);}
+  .orb .mark{position:absolute; inset-inline-start:50%; top:50%; transform:translate(-50%,-50%); z-index:4; height:54px; opacity:0; will-change:opacity,transform;}
+  .orb.pulse .halo{animation:pulse 3.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1); opacity:.85;} 50%{transform:scale(1.12); opacity:1;}}
+
+  /* chaos fragments */
+  .chaos{position:absolute; inset:0; z-index:2; pointer-events:none;}
+  .frag{position:absolute; inset-inline-start:50%; top:50%; display:inline-flex; align-items:center; gap:7px;
+    padding:9px 14px; border-radius:14px; font-size:13px; color:#fff; white-space:nowrap; opacity:0; will-change:transform,opacity;
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); backdrop-filter:blur(6px);
+    box-shadow:0 10px 30px -14px rgba(0,0,0,.6);}
+  .frag::after{content:''; position:absolute; top:-4px; inset-inline-start:-4px; width:8px; height:8px; border-radius:50%; background:#ff5a7a; box-shadow:0 0 10px #ff5a7a;}
+
+  /* captions (cross-faded by scroll) */
+  .cap{position:absolute; inset-inline:0; text-align:center; padding:0 24px; z-index:5; will-change:opacity,transform; pointer-events:none;}
+  .cap-hook{top:50%; transform:translateY(-50%);}
+  .cap-enemy{bottom:13vh;}
+  .cap-reveal{top:11vh; opacity:0;}
+  .cap h2{margin-bottom:14px;}
+  .cap p{margin:0 auto; max-width:520px;}
+  .scrollcue{position:absolute; bottom:26px; inset-inline:0; text-align:center; color:var(--muted); font-size:12px; z-index:6;}
+  .scrollcue .arr{display:block; margin:9px auto 0; width:18px; height:18px; border-inline-start:2px solid var(--violet-2); border-bottom:2px solid var(--violet-2); transform:rotate(-45deg); animation:bob 1.7s infinite;}
+  @keyframes bob{0%,100%{transform:rotate(-45deg) translate(0,0); opacity:.4;} 50%{transform:rotate(-45deg) translate(-3px,3px); opacity:1;}}
+
+  /* app reveal card */
+  .appui{position:absolute; inset-inline-start:50%; bottom:7vh; transform:translateX(-50%) translateY(70%); z-index:4;
+    width:min(330px,84vw); background:var(--card); border:1px solid var(--line); border-radius:22px; padding:14px;
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.8); opacity:0; will-change:transform,opacity;}
+  .appui .hd{display:flex; align-items:center; gap:9px; margin-bottom:13px;}
+  .appui .hd .lg{width:26px; height:26px; border-radius:8px; background:linear-gradient(140deg,var(--grad-a),var(--grad-b)); display:grid; place-items:center;}
+  .appui .hd .lg img{height:14px;}
+  .appui .hd b{font-size:14px;}
+  .appui .hd .dot{margin-inline-start:auto; width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green);}
+  .appui .row{display:flex; align-items:center; gap:10px; padding:10px; border-radius:13px; background:rgba(255,255,255,.04); margin-bottom:8px;}
+  .appui .row .ic{width:30px; height:30px; border-radius:9px; display:grid; place-items:center; font-size:15px; background:rgba(123,108,246,.16); flex-shrink:0;}
+  .appui .row .tx{flex:1;}
+  .appui .row .tx b{font-size:12.5px; font-weight:600; display:block;}
+  .appui .row .tx span{font-size:11px; color:var(--muted);}
+
+  /* ============ FEATURES (feelings) ============ */
+  .fcard{background:var(--card); border:1px solid var(--line); border-radius:24px; padding:30px; margin-bottom:18px;
+    display:flex; gap:20px; align-items:flex-start;}
+  .fcard .ico{width:52px; height:52px; border-radius:15px; flex-shrink:0; display:grid; place-items:center; font-size:24px;
+    background:linear-gradient(140deg,rgba(123,108,246,.22),rgba(232,121,185,.22)); border:1px solid rgba(162,155,254,.25);}
+  .fcard h3{font-size:clamp(21px,3.4vw,28px); font-weight:600; margin-bottom:9px; letter-spacing:-.3px;}
+  .fcard p{font-size:15px; color:#b9b6c8; line-height:1.75; font-weight:300;}
+
+  /* ============ TRIBES (horizontal carousel) ============ */
+  .tcar{display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+    padding:4px 0 10px; scrollbar-width:none;}
+  .tcar::-webkit-scrollbar{display:none;}
+  .tcard{flex:0 0 min(330px,82%); scroll-snap-align:center; background:var(--card); border:1px solid var(--line);
+    border-radius:24px; padding:28px;}
+  .tcard .th{display:flex; align-items:center; gap:13px; margin-bottom:20px;}
+  .tcard .th .ic{width:46px; height:46px; border-radius:14px; flex-shrink:0; display:grid; place-items:center; font-size:22px;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b));}
+  .tcard .th b{font-size:19px; font-weight:600; letter-spacing:-.3px;}
+  .tcard ul{list-style:none;}
+  .tcard li{display:flex; align-items:center; gap:10px; font-size:14.5px; color:#cbc8d8; padding:9px 0; border-top:1px solid rgba(255,255,255,.06);}
+  .tcard li:first-child{border-top:none;}
+  .tcard li::before{content:''; width:7px; height:7px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg,var(--grad-a),var(--grad-b));}
+  .cdots{display:flex; justify-content:center; gap:7px; margin-top:22px;}
+  .cdot{width:7px; height:7px; padding:0; border:none; border-radius:999px; cursor:pointer; background:rgba(255,255,255,.25);
+    transition:width .35s cubic-bezier(.2,.7,.2,1), background .35s;}
+  .cdot.on{width:22px; background:linear-gradient(90deg,var(--grad-a),var(--grad-b));}
+
+  /* ============ PRICING (light break) ============ */
+  #pricing{background:var(--paper); color:var(--ink-2); text-align:center;}
+  #pricing .lede{color:#4a4856;}
+  #pricing .deal{display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:34px;}
+  #pricing .dcard{background:#fff; border:1px solid #e9e5db; border-radius:22px; padding:24px 26px; min-width:230px; text-align:start;
+    box-shadow:0 26px 50px -34px rgba(40,30,80,.35);}
+  #pricing .dcard .k{font-size:12.5px; font-weight:600; color:var(--violet); margin-bottom:8px;}
+  #pricing .dcard b{font-size:19px; font-weight:600; color:var(--ink-2); display:block; margin-bottom:6px;}
+  #pricing .dcard span{font-size:13.5px; color:#6a6776; line-height:1.7;}
+
+  /* ============ FINALE ============ */
+  #finale{text-align:center; background:radial-gradient(120% 80% at 50% 30%, rgba(123,108,246,.16), transparent 60%);}
+  #finale .wrap{display:flex; flex-direction:column; align-items:center;}
+  .cta{display:inline-flex; align-items:center; gap:10px; padding:18px 38px; border-radius:999px; font-size:17px; font-weight:600;
+    color:#fff; background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); margin-top:34px; cursor:pointer;
+    box-shadow:0 22px 54px -16px rgba(123,108,246,.7); transition:transform .25s;}
+  .cta:hover{transform:translateY(-3px);}
+  .alt{margin-top:22px; font-size:13px; color:var(--muted);}
+  .alt a{color:var(--violet-2); border-bottom:1px solid rgba(162,155,254,.4); padding-bottom:2px;}
+
+  /* responsive */
+  @media(max-width:720px){
+    .wrap{padding:0 20px;}
+    .scene{padding:12vh 0;}
+    .fcard{padding:24px; gap:15px; border-radius:20px;}
+    .fcard .ico{width:46px; height:46px; font-size:21px;}
+    .orbWrap{width:180px; height:180px;}
+    .cap-enemy{bottom:11vh;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important;}
+    .rv{transition-duration:.001ms !important;}
+  }
+</style>
+</head>
+<body>
+<div id="prog"></div>
+
+<!-- ============ 1-3 · CINEMATIC ACT ============ -->
+<section id="act">
+  <div class="stage">
+    <!-- the محور orb -->
+    <div class="orbWrap">
+      <div class="orb pulse">
+        <div class="ring r2"></div><div class="ring r1"></div>
+        <div class="halo"></div><div class="disc"></div>
+        <img class="mark" src="project/assets/mhwar-mark.svg" alt="محور">
+      </div>
+    </div>
+
+    <!-- chaos fragments (absorbed into the orb on scroll) -->
+    <div class="chaos" id="chaos">
+      <div class="frag" data-x="-150" data-y="-120">💬 قروب آخر…</div>
+      <div class="frag" data-x="160" data-y="-90">📊 إكسل لا ينتهي</div>
+      <div class="frag" data-x="-180" data-y="60">📧 إيميل ضاع</div>
+      <div class="frag" data-x="150" data-y="120">🔔 رسائل غير مقروءة</div>
+      <div class="frag" data-x="-70" data-y="170">👥 خمس أدوات</div>
+      <div class="frag" data-x="80" data-y="-180">🗂️ قوائم مبعثرة</div>
+    </div>
+
+    <!-- captions -->
+    <div class="cap cap-hook">
+      <h2 class="display">مجتمعك...<br><span class="grad">يدور حولك.</span></h2>
+      <p class="lede">أنت من جمعتهم على فكرة. حان الوقت لتمتلك المكان الذي يجمعهم.</p>
+    </div>
+    <div class="cap cap-enemy">
+      <h2 class="big">تبني جمهوراً... <span style="color:var(--muted)">وتفقده في الضجيج.</span></h2>
+      <p class="lede" style="margin-top:12px">قروبات تتكاثر، رسائل لا تُقرأ، وقوائم مبعثرة. جهدك في بناء مجتمعك يستحق ما هو أفضل من التشتت.</p>
+    </div>
+    <div class="cap cap-reveal">
+      <h2 class="big">كل ما تحتاجه، في <span class="grad">«محور» واحد.</span></h2>
+      <p class="lede" style="margin-top:12px">منصّة واحدة تنظّم جمهورك، تدير فعالياتك، وتوصل رسائلك بوضوح.</p>
+    </div>
+
+    <!-- app reveal -->
+    <div class="appui" id="appui">
+      <div class="hd"><span class="lg"><img src="project/assets/mhwar-mark.svg" alt="محور"></span><b>محور</b><span class="dot"></span></div>
+      <div class="row"><span class="ic">👥</span><div class="tx"><b>جمهورك</b><span>٣١٢ عضواً · في مكان واحد</span></div></div>
+      <div class="row"><span class="ic">💬</span><div class="tx"><b>رسالة جديدة</b><span>واتساب + البريد · تصل فوراً</span></div></div>
+      <div class="row"><span class="ic">🎟️</span><div class="tx"><b>فعاليتك</b><span>ملتقى الجمعة · ٨٤ تأكيد حضور</span></div></div>
+    </div>
+
+    <div class="scrollcue" id="scrollcue">مرّر للأسفل<span class="arr"></span></div>
+  </div>
+</section>
+
+<!-- ============ 4 · FEATURES TO FEELINGS ============ -->
+<section class="scene" id="features">
+  <div class="wrap">
+    <div style="text-align:center; max-width:640px; margin:0 auto 40px">
+      <h2 class="big rv">قوّةٌ بين يديك.</h2>
+    </div>
+    <div class="fcard rv">
+      <div class="ico">📣</div>
+      <div><h3>صوتك يصل... فوراً.</h3><p>دعوات ورسائل عبر واتساب والبريد تُقرأ في لحظتها.</p></div>
+    </div>
+    <div class="fcard rv d1">
+      <div class="ico">🎟️</div>
+      <div><h3>من الدعوة، إلى الشهادة.</h3><p>أدِر فعالياتك بسلاسة: تسجيل، تذاكر QR، حضور، وشهادات تلقائية.</p></div>
+    </div>
+    <div class="fcard rv d2">
+      <div class="ico">📈</div>
+      <div><h3>اعرف من يهتم.</h3><p>بيانات مجتمعك ملكك. اكتشف من يتفاعل، وكبّر دائرتك بثقة.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · TRIBES (carousel) ============ -->
+<section class="scene" id="tribes">
+  <div class="wrap">
+    <div style="text-align:center; max-width:640px; margin:0 auto 36px">
+      <h2 class="big rv">لمن صُنعت محور؟</h2>
+      <p class="lede rv d1" style="margin:16px auto 0">إن كان حولك جمهورٌ تريد أن تبقى على صلةٍ به — فمحور لك.</p>
+    </div>
+    <div class="tcar rv d1" id="tcar">
+      <div class="tcard">
+        <div class="th"><span class="ic">♥</span><b>المنظّمات غير الربحية</b></div>
+        <ul><li>حملات واتساب</li><li>إدارة المتطوّعين</li><li>قياس الأثر</li></ul>
+      </div>
+      <div class="tcard">
+        <div class="th"><span class="ic">◈</span><b>المجتمعات المهنية</b></div>
+        <ul><li>عضويّات مخصّصة</li><li>لقاءات دوريّة</li><li>توثيق الحضور</li></ul>
+      </div>
+      <div class="tcard">
+        <div class="th"><span class="ic">★</span><b>الأندية الطلابية</b></div>
+        <ul><li>تسجيل سريع</li><li>إعلانات فوريّة</li><li>أرشيف للأنشطة</li></ul>
+      </div>
+      <div class="tcard">
+        <div class="th"><span class="ic">⬣</span><b>المجالس والديوانيات</b></div>
+        <ul><li>دعوات المناسبات</li><li>نشرة العائلة</li><li>تحديثات هامة</li></ul>
+      </div>
+    </div>
+    <div class="cdots" id="tdots" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ============ 6 · PRICING (light) ============ -->
+<section class="scene" id="pricing">
+  <div class="wrap">
+    <h2 class="big rv">ادفع بقدر <span class="grad">نموك.</span></h2>
+    <p class="lede rv d1" style="margin:20px auto 0; max-width:600px">اشتراك ثابت لقوة المنصّة، ومحفظة مرنة تدفع منها فقط لرسائلك التي تصل. بلا مفاجآت، وبلا هدر.</p>
+    <div class="deal rv d2">
+      <div class="dcard"><div class="k">الاشتراك</div><b>قوّة المنصّة</b><span>كل الأدوات والمزايا برسمٍ ثابت وواضح.</span></div>
+      <div class="dcard"><div class="k">المحفظة</div><b>تدفع لما يصل</b><span>رصيدٌ مرن للرسائل — تُنفق منه فقط عند الإرسال الفعلي.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7 · FINALE ============ -->
+<section class="scene" id="finale">
+  <div class="wrap">
+    <h2 class="display rv">كُن أنت <span class="grad">المِحور.</span></h2>
+    <a class="cta rv d2" href="https://mhwar.com/c/mhwar1" target="_blank" rel="noopener">ابدأ مجتمعك الآن ←</a>
+    <div class="alt rv d3">أو <a href="index.html">شاهد القصة الكاملة</a> · <a href="v2.html">جرّب تجربة العُمق</a></div>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $  = (s,r=document)=>r.querySelector(s);
+  const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+  const clamp = (v,a,b)=>Math.min(b,Math.max(a,v));
+  const map = (p,a,b)=>clamp((p-a)/(b-a),0,1);
+
+  /* reveal */
+  const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:.18});
+  $$('.rv:not(.in)').forEach(el=>io.observe(el));
+
+  /* progress bar */
+  const prog = $('#prog');
+
+  /* ---------- cinematic act: scrub by scroll progress ---------- */
+  const act = $('#act');
+  const orbWrap = $('.orbWrap'), orb = $('.orb'), halo = $('.halo'), disc = $('.disc'),
+        mark = $('.orb .mark'), frags = $$('#chaos .frag'),
+        capHook = $('.cap-hook'), capEnemy = $('.cap-enemy'), capReveal = $('.cap-reveal'),
+        appui = $('#appui'), scrollcue = $('#scrollcue');
+  if(reduce) orb.classList.remove('pulse');
+
+  function scrub(){
+    const total = act.offsetHeight - innerHeight;
+    const p = total>0 ? clamp(-act.getBoundingClientRect().top/total, 0, 1) : 0;
+
+    // Hook caption: present, then lifts away (0.14 → 0.30)
+    const hookOut = map(p,0.14,0.30);
+    capHook.style.opacity = 1 - hookOut;
+    capHook.style.transform = 'translateY(calc(-50% - '+(hookOut*40)+'px))';
+    if(scrollcue) scrollcue.style.opacity = 1 - map(p,0.05,0.16);
+
+    // Chaos: appear (0.26 → 0.42), then get absorbed into the orb (0.50 → 0.76)
+    const appear = map(p,0.26,0.42), absorb = map(p,0.50,0.76);
+    frags.forEach(f=>{
+      const x = (+f.dataset.x)*(1-absorb), y = (+f.dataset.y)*(1-absorb);
+      f.style.opacity = appear*(1-absorb);
+      f.style.transform = 'translate(-50%,-50%) translate('+x+'px,'+y+'px) scale('+(1-absorb*0.82)+')';
+    });
+
+    // Enemy caption: in (0.40 → 0.50), out (0.66 → 0.76)
+    capEnemy.style.opacity = map(p,0.40,0.50) * (1 - map(p,0.66,0.76));
+    capEnemy.style.transform = 'translateY('+(map(p,0.66,0.76)*-24)+'px)';
+
+    // Orb intensifies as it swallows the chaos, peaks at absorption end
+    const heat = 0.85 + absorb*0.6;
+    halo.style.transform = 'scale('+heat+')';
+    halo.style.opacity = 0.7 + absorb*0.3;
+    disc.style.transform = 'scale('+(1+absorb*0.06)+')';
+
+    // Reveal: logo crystallizes (0.72 → 0.86), orb lifts, app card rises (0.82 → 1)
+    const logoIn = map(p,0.72,0.86);
+    mark.style.opacity = logoIn;
+    mark.style.transform = 'translate(-50%,-50%) scale('+(0.7+logoIn*0.3)+')';
+    disc.style.opacity = 1 - map(p,0.80,0.95)*0.25;            // disc dims slightly as logo takes over
+    const lift = map(p,0.82,1);
+    orbWrap.style.transform = 'translate(-50%,-50%) translateY('+(-lift*20)+'vh) scale('+(1-lift*0.34)+')';
+    capReveal.style.opacity = map(p,0.80,0.90);
+    capReveal.style.transform = 'translateY('+(8 - map(p,0.80,0.90)*8)+'px)';
+    const rise = map(p,0.82,1);
+    appui.style.opacity = rise;
+    appui.style.transform = 'translateX(-50%) translateY('+((1-rise)*70)+'%)';
+  }
+
+  /* ---------- tribes carousel: dots + autoplay + scroll sync ---------- */
+  (function(){
+    const car = $('#tcar'); if(!car) return;
+    const cards = $$('.tcard', car), dotsBox = $('#tdots');
+    let idx = 0, inView = false, pausedUntil = 0;
+    const setActive = i=>{ idx=i; [...dotsBox.children].forEach((d,j)=>d.classList.toggle('on', j===i)); };
+    const goTo = i=>{ setActive(i); cards[i].scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); };
+    const pause = ()=>{ pausedUntil = Date.now()+6000; };
+    cards.forEach((c,i)=>{ const b=document.createElement('button'); b.className='cdot'+(i===0?' on':'');
+      b.setAttribute('aria-label','عرض '+(i+1)); b.addEventListener('click',()=>{ pause(); goTo(i); }); dotsBox.appendChild(b); });
+    let st; car.addEventListener('scroll', ()=>{ clearTimeout(st); st=setTimeout(()=>{
+      const box=car.getBoundingClientRect(), mid=box.left+box.width/2; let best=0,bd=Infinity;
+      cards.forEach((c,i)=>{ const r=c.getBoundingClientRect(); const d=Math.abs((r.left+r.right)/2-mid); if(d<bd){bd=d;best=i;} });
+      setActive(best);
+    },90); }, {passive:true});
+    ['pointerdown','touchstart','wheel'].forEach(ev=>car.addEventListener(ev,pause,{passive:true}));
+    new IntersectionObserver(es=>es.forEach(e=>inView=e.isIntersecting), {threshold:.4}).observe(car);
+    if(reduce) return;
+    setInterval(()=>{ if(!inView || Date.now()<pausedUntil) return; goTo((idx+1)%cards.length); }, 4000);
+  })();
+
+  /* ---------- scroll loop ---------- */
+  let ticking=false;
+  function onScroll(){
+    prog.style.width = Math.min(100, (scrollY/((document.documentElement.scrollHeight-innerHeight)||1))*100)+'%';
+    scrub();
+    ticking=false;
+  }
+  addEventListener('scroll', ()=>{ if(!ticking){ ticking=true; requestAnimationFrame(onScroll); } }, {passive:true});
+  addEventListener('resize', onScroll);
+  onScroll();
+})();
+</script>
+</body>
+</html>
