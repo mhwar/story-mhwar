@@ -370,6 +370,22 @@
     #events .etypes{ gap:10px !important; }
     #events div[style*="margin:30px 0 14px"]{ margin:16px 0 10px !important; } /* ②③ step spacers */
   }
+
+  /* ============================================================
+     CAROUSEL POSITION DOTS (mobile only)
+     One dot per card under each horizontal carousel; the active dot
+     elongates into a brand-gradient pill. `.light` variant = dark dots
+     for use on light (paper) sections. Hidden on desktop.
+     ============================================================ */
+  .cdots{ display:none; }
+  @media(max-width:780px){
+    .cdots{ display:flex; justify-content:center; gap:7px; margin-top:16px; }
+    .cdot{ width:7px; height:7px; padding:0; border:none; border-radius:999px; cursor:pointer;
+           background:rgba(255,255,255,.28); transition:width .35s cubic-bezier(.2,.7,.2,1), background .35s; }
+    .cdot.on{ width:22px; background:linear-gradient(90deg, var(--grad-a), var(--grad-b)); }
+    .cdots.light .cdot{ background:rgba(0,0,0,.16); }
+    .cdots.light .cdot.on{ background:linear-gradient(90deg, var(--grad-a), var(--grad-b)); }
+  }
 </style>
 </head>
 <body>
@@ -834,28 +850,56 @@
     track.style.transform = 'translateX('+ (prog*max) +'px)';
   }
 
-  // ---- Mobile carousels: gentle auto-advance (patterns + use-cases) ----
+  // ---- Mobile carousels: dots indicator + gentle auto-advance ----
   // On mobile the patterns and use-cases rows are native horizontal carousels.
-  // Each one slowly cycles through its cards while it's on screen and the user
-  // isn't interacting, then loops back. RTL-safe via scrollIntoView. Runs only
-  // on mobile (where the carousels exist) and respects reduced-motion.
-  (function initCarouselAutoplay(){
-    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // For each we build a dots indicator (active dot = elongated pill) that tracks
+  // the centred card, plus a slow auto-advance that loops, pauses on touch/wheel,
+  // and only runs while the carousel is on screen. RTL-safe via scrollIntoView.
+  // Dots stay in sync with manual scrolling and are clickable. Autoplay respects
+  // prefers-reduced-motion; all of it is inert on desktop (dots hidden via CSS,
+  // autoplay gated by isMobile()).
+  (function initCarousels(){
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const carousels = [
-      { el: track,                          cards: [...track.querySelectorAll('.pcard')] },
-      { el: document.querySelector('.ufeed'), cards: ucards }
+      { el: track,                          cards: [...track.querySelectorAll('.pcard')], light:false },
+      { el: document.querySelector('.ufeed'), cards: ucards,                              light:true  }
     ];
     carousels.forEach(c=>{
       if(!c.el || c.cards.length < 2) return;
       let idx = 0, inView = false, pausedUntil = 0;
-      new IntersectionObserver(es=>es.forEach(e=> inView = e.isIntersecting), {threshold:.4}).observe(c.el);
-      // a genuine touch / wheel / pointer pauses autoplay for a while
+
+      // build the dots indicator (light variant = dark dots, for light sections)
+      const dots = document.createElement('div');
+      dots.className = 'cdots' + (c.light ? ' light' : '');
+      const setActive = i =>{ idx = i; [...dots.children].forEach((d,j)=> d.classList.toggle('on', j===i)); };
+      const goTo = i =>{ setActive(i); c.cards[i].scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); };
       const pause = ()=>{ pausedUntil = Date.now() + 6000; };
+      c.cards.forEach((card,i)=>{
+        const b = document.createElement('button');
+        b.className = 'cdot' + (i===0 ? ' on' : '');
+        b.setAttribute('aria-label', 'الانتقال إلى البطاقة ' + (i+1));
+        b.addEventListener('click', ()=>{ pause(); goTo(i); });
+        dots.appendChild(b);
+      });
+      c.el.insertAdjacentElement('afterend', dots);
+
+      // keep the active dot synced with manual scrolling
+      let st;
+      c.el.addEventListener('scroll', ()=>{ clearTimeout(st); st = setTimeout(()=>{
+        const box = c.el.getBoundingClientRect(), mid = box.left + box.width/2;
+        let best = 0, bd = Infinity;
+        c.cards.forEach((card,i)=>{ const r = card.getBoundingClientRect(); const d = Math.abs((r.left+r.right)/2 - mid); if(d < bd){ bd = d; best = i; } });
+        setActive(best);
+      }, 90); }, {passive:true});
+
+      // genuine user interaction pauses autoplay for a while
       ['pointerdown','touchstart','wheel'].forEach(ev=> c.el.addEventListener(ev, pause, {passive:true}));
+      new IntersectionObserver(es=>es.forEach(e=> inView = e.isIntersecting), {threshold:.4}).observe(c.el);
+
+      if(reduceMotion) return;            // dots stay interactive; skip auto-advance
       setInterval(()=>{
         if(!isMobile() || !inView || Date.now() < pausedUntil) return;
-        idx = (idx + 1) % c.cards.length;
-        c.cards[idx].scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+        goTo((idx + 1) % c.cards.length);
       }, 3800);
     });
   })();
