@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مقترح محور</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; padding: 0; font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; background: #e8e6e0; }
+  .shell-loading, .shell-error {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px; padding: 40px; text-align: center;
+  }
+  .shell-loading .spinner {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 4px solid oklch(0.92 0.03 60); border-top-color: oklch(0.5 0.17 60);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .shell-loading h1 { font-size: 22px; font-weight: 600; color: #14130f; margin: 0; letter-spacing: -0.4px; }
+  .shell-loading p { font-size: 14px; color: #6b6a64; margin: 0; }
+  .shell-error {
+    background: #fbfaf7;
+  }
+  .shell-error .icon { font-size: 56px; color: oklch(0.55 0.18 30); margin-bottom: 8px; }
+  .shell-error h1 { font-size: 26px; font-weight: 600; color: #14130f; margin: 0 0 8px; }
+  .shell-error p { font-size: 15px; color: #6b6a64; max-width: 480px; line-height: 1.7; margin: 0; }
+  .shell-error a {
+    padding: 12px 20px; background: oklch(0.5 0.17 60); color: #14130f;
+    border-radius: 10px; font-size: 14px; font-weight: 600; margin-top: 12px;
+    text-decoration: none; display: inline-block;
+  }
+  #proposal-root { min-height: 100vh; }
+</style>
+</head>
+<body>
+<div id="proposal-root">
+  <div class="shell-loading">
+    <div class="spinner"></div>
+    <h1>جارٍ تحميل المقترح…</h1>
+    <p>لحظات فقط</p>
+  </div>
+</div>
+
+<script src="src/atlas-proposal.jsx"></script>
+
+<script>
+(function() {
+  const root = document.getElementById('proposal-root');
+
+  function showError(msg, extra) {
+    root.innerHTML = `
+      <div class="shell-error">
+        <div class="icon">⚠</div>
+        <h1>تعذّر فتح المقترح</h1>
+        <p>${msg}</p>
+        ${extra ? `<p style="font-size:12px;color:#9b9a94;margin-top:8px">${extra}</p>` : ''}
+        <a href="./Mhwar Emails.html">الذهاب إلى منصّة محور</a>
+      </div>`;
+  }
+
+  // Wait for atlas-proposal.jsx to register window.buildProposalHTML
+  function waitForBuilder(attempts) {
+    if (window.buildProposalHTML) { init(); return; }
+    if (attempts <= 0) { showError('تعذّر تحميل محرك العرض. حاول إعادة تحميل الصفحة.'); return; }
+    setTimeout(() => waitForBuilder(attempts - 1), 100);
+  }
+
+  function init() {
+    const hash = (location.hash || '').replace(/^#/, '');
+    if (!hash) {
+      showError('رابط المقترح غير مكتمل — يبدو أن البيانات لم تُمرَّر عبر الرابط.');
+      return;
+    }
+    let payload;
+    try {
+      const json = decodeURIComponent(escape(atob(hash)));
+      payload = JSON.parse(json);
+    } catch (e) {
+      showError('تعذّر قراءة بيانات المقترح من الرابط.', e.message);
+      return;
+    }
+
+    const { client, cat, communities = [], patterns = [], traits = [], cases = [], detailComIds = [], includeInvestment = false } = payload;
+    if (!client || !communities.length) {
+      showError('المقترح لا يحتوي على بيانات عميل أو مجتمعات صالحة.');
+      return;
+    }
+
+    const resolvePattern = (com) => com.rootPattern ? patterns.find(p => p.id === com.rootPattern) : null;
+    const resolveTraits = (com) => (com.traits || []).map(tid => traits.find(t => t.id === tid)).filter(Boolean);
+    const resolveSourceCase = (com) => com.caseId ? cases.find(c => c.uid === com.caseId) : null;
+
+    let out;
+    try {
+      out = window.buildProposalHTML({
+        client, cat, communities,
+        resolvePattern, resolveTraits, resolveSourceCase,
+        detailComIds,
+        includeInvestment,
+        shareLink: location.href,
+      });
+    } catch (e) {
+      showError('تعذّر بناء المقترح.', e.message);
+      return;
+    }
+
+    // Render the full proposal document by replacing the entire page
+    document.title = out.title;
+
+    // Parse the generated HTML to extract <style> and <body> content
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(out.html, 'text/html');
+
+    // Inject styles into head
+    const newStyles = doc.querySelectorAll('style, link[rel="stylesheet"]');
+    newStyles.forEach(s => document.head.appendChild(s.cloneNode(true)));
+
+    // Replace body content entirely
+    document.body.innerHTML = doc.body.innerHTML;
+
+    // innerHTML does not execute scripts — re-inject them
+    doc.body.querySelectorAll('script').forEach(oldScript => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) newScript.src = oldScript.src;
+      else newScript.textContent = oldScript.textContent;
+      document.body.appendChild(newScript);
+    });
+
+    // Wire up any inline onclick handlers (they're inline, so they already work)
+    // But we need to make sure the toolbar button knows about share link
+    const shareBtn = Array.from(document.querySelectorAll('.toolbar button')).find(b => /رابط/.test(b.textContent));
+    if (shareBtn) {
+      shareBtn.onclick = () => {
+        navigator.clipboard.writeText(location.href);
+        shareBtn.textContent = 'نُسخ ✓';
+        setTimeout(() => { shareBtn.textContent = 'نسخ رابط المشاركة'; }, 1500);
+      };
+    }
+  }
+
+  waitForBuilder(40); // 4s max
+})();
+</script>
+
+</body>
+</html>

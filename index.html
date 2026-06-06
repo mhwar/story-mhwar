@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محور — المركز الذي يدور حوله مجتمعك</title>
+<meta name="description" content="محور — منصّة إدارة المجتمعات والفعاليات. اجمع جمهورك، أوصل رسالتك عبر واتساب والبريد، وأدِر فعاليّاتك من الدعوة إلى الشهادة.">
+<meta property="og:title" content="محور — المركز الذي يدور حوله مجتمعك">
+<meta property="og:description" content="منصّة عربية تجمع جمهورك، محتواك، وفعاليّاتك في مكان واحد.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mhwar.com">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="محور — المركز الذي يدور حوله مجتمعك">
+<meta name="twitter:description" content="منصّة عربية تجمع جمهورك، محتواك، وفعاليّاتك في مكان واحد.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0b14; --paper:#f5f3ef; --muted:#8a8896;
+    --violet:#6c5ce7; --violet-2:#a29bfe; --grad-a:#7b6cf6; --grad-b:#e879b9;
+    --green:#22c79a; --amber:#f6b948;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink); color:#fff;
+    font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  ::selection{background:var(--violet); color:#fff;}
+
+  /* progress rail */
+  #rail{position:fixed; top:0; inset-inline-start:0; height:3px; width:0%; z-index:200;
+    background:linear-gradient(90deg,var(--grad-a),var(--grad-b)); transition:width .1s linear;}
+
+  /* top brand */
+  #brand{position:fixed; top:20px; inset-inline-end:30px; z-index:150; display:flex; align-items:center; gap:9px;
+    opacity:0; transition:opacity .6s;}
+  #brand .dot{width:11px;height:11px;border-radius:50%;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));box-shadow:0 0 14px var(--violet);}
+  #brand b{font-size:15px;font-weight:600;letter-spacing:.5px;}
+  #brand.show{opacity:1;}
+
+  .act{position:relative;}
+  .stage{position:sticky; top:0; height:100vh; overflow:hidden; display:grid; place-items:center;}
+  .wrap{max-width:1100px; padding:0 28px; width:100%;}
+
+  /* generic reveal */
+  .rv{opacity:0; transform:translateY(30px); transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1);}
+  .rv.in{opacity:1; transform:none;}
+  .rv{transition:opacity 1.05s cubic-bezier(.16,.7,.2,1), transform 1.05s cubic-bezier(.16,.7,.2,1);}
+  .rv.d1{transition-delay:.08s;} .rv.d2{transition-delay:.16s;} .rv.d3{transition-delay:.24s;} .rv.d4{transition-delay:.32s;}
+
+  h1,h2{font-weight:600; letter-spacing:-1px; line-height:1.08;}
+  .huge{font-size:clamp(44px,8vw,104px);}
+  .big{font-size:clamp(34px,6vw,76px);}
+  .kicker{font-size:13px; letter-spacing:3px; color:var(--violet-2); text-transform:uppercase; margin-bottom:18px; font-weight:600;}
+  .lede{font-size:clamp(17px,2.4vw,24px); color:#c9c7d6; line-height:1.7; max-width:640px; font-weight:300;}
+  .grad-text{background:linear-gradient(120deg,var(--grad-a),var(--grad-b)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+
+  /* HERO */
+  #hero .glow{position:absolute; width:120vmax; height:120vmax; border-radius:50%;
+    background:radial-gradient(circle, rgba(108,92,231,.35), transparent 60%); filter:blur(20px);
+    inset-inline-start:-30vmax; top:-40vmax;}
+  #hero .glow2{position:absolute; width:90vmax; height:90vmax; border-radius:50%;
+    background:radial-gradient(circle, rgba(232,121,185,.22), transparent 60%);
+    inset-inline-end:-30vmax; bottom:-40vmax;}
+  #hero .mark{width:74px;height:74px;border-radius:21px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b));
+    box-shadow:0 24px 60px -16px rgba(108,92,231,.6); font-size:38px; font-weight:700;}
+
+  /* orbit system — your community revolves around you (the محور) */
+  .orbit{position:relative; width:300px; height:300px; margin:0 auto 30px;}
+  .orbit .mark{position:absolute; inset-inline-start:50%; top:50%; transform:translate(-50%,-50%); z-index:3;}
+  .orbit .ring{position:absolute; inset:0; border-radius:50%; border:1px solid rgba(255,255,255,.09); animation:spin linear infinite;}
+  .orbit .ring.r1{animation-duration:18s;}
+  .orbit .ring.r2{inset:-46px; animation-duration:30s; animation-direction:reverse; border-color:rgba(108,92,231,.18);}
+  .orbit .ring.r3{inset:-92px; animation-duration:44s; border-color:rgba(232,121,185,.12);}
+  .orbit .node{position:absolute; inset-inline-start:50%; top:-6px; transform:translateX(-50%);
+    width:13px;height:13px;border-radius:50%; box-shadow:0 0 14px currentColor;}
+  .orbit .ring.r1 .node{color:var(--violet-2); background:var(--violet-2);}
+  .orbit .ring.r2 .node{color:var(--green); background:var(--green);}
+  .orbit .ring.r3 .node{color:var(--amber); background:var(--amber);}
+  .orbit .node.alt{top:auto; bottom:-6px;}
+  .orbit .node.side{top:50%; inset-inline-start:-6px; transform:translateY(-50%);}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .orbit .ring.r2{inset:-46px;} .orbit .ring.r3{inset:-92px;}
+  #hero .scrollcue{position:absolute; bottom:34px; inset-inline:0; text-align:center; color:var(--muted); font-size:12px; letter-spacing:2px;}
+  #hero .scrollcue .arrow{display:block; margin:10px auto 0; width:22px; height:22px; border-inline-start:2px solid var(--muted); border-bottom:2px solid var(--muted); transform:rotate(-45deg); animation:bob 1.6s infinite;}
+  @keyframes bob{0%,100%{transform:rotate(-45deg) translate(0,0);opacity:.4;}50%{transform:rotate(-45deg) translate(-4px,4px);opacity:1;}}
+
+  /* PROBLEM — floating chaotic bubbles */
+  .bubbles{position:absolute; inset:0; pointer-events:none;}
+  .bubble{position:absolute; padding:10px 15px; border-radius:16px; font-size:13px; color:#fff;
+    background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); backdrop-filter:blur(6px);
+    white-space:nowrap; opacity:0; transform:scale(.6);}
+  .act.problem.lit .bubble{opacity:1; transform:scale(1); transition:opacity .7s, transform .7s;}
+
+  /* HORIZONTAL drag act */
+  #patterns .track{display:flex; gap:34px; will-change:transform; align-items:center; padding:0 8vw;}
+  .pcard{flex:0 0 min(78vw,460px); border-radius:28px; padding:40px; min-height:62vh;
+    display:flex; flex-direction:column; justify-content:space-between; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);}
+  .pcard .pno{font-size:13px; letter-spacing:3px; opacity:.7;}
+  .pcard h3{font-size:38px; font-weight:600; letter-spacing:-.5px; margin:6px 0 14px;}
+  .pcard p{font-size:16px; line-height:1.7; color:rgba(255,255,255,.82); font-weight:300;}
+  .pcard .ico{font-size:54px; margin-bottom:auto;}
+  .pcard ul{list-style:none; margin-top:22px; display:flex; flex-direction:column; gap:9px;}
+  .pcard li{font-size:13.5px; color:rgba(255,255,255,.9); display:flex; gap:8px; align-items:center;}
+  .pcard li::before{content:'›'; color:#fff; opacity:.6;}
+  #patterns .hint{position:absolute; bottom:30px; inset-inline:0; text-align:center; color:var(--muted); font-size:12px; letter-spacing:2px;}
+
+  /* FEATURE rows */
+  .feat{display:grid; grid-template-columns:1fr 1fr; gap:50px; align-items:center;}
+  .feat .visual{aspect-ratio:1/.82; border-radius:26px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,.1); background:#14121f;}
+  .chip{display:inline-flex; align-items:center; gap:7px; padding:7px 13px; border-radius:999px; font-size:12.5px;
+    background:rgba(108,92,231,.16); border:1px solid rgba(108,92,231,.4); color:var(--violet-2); margin-bottom:18px;}
+
+  /* event tool cards */
+  .ecard{background:#15131f; border:1px solid rgba(255,255,255,.09); border-radius:20px; padding:24px;
+    transition:transform .4s, border-color .4s;}
+  .ecard:hover{transform:translateY(-4px); border-color:rgba(108,92,231,.5);}
+  .ecard .en{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--violet-2); letter-spacing:2px; margin-bottom:14px;}
+  .ecard h4{font-size:19px; font-weight:600; margin-bottom:8px; letter-spacing:-.3px;}
+  .ecard p{font-size:13.5px; line-height:1.7; color:#b9b7c6; font-weight:300;}
+  /* use-case cards (light section) */
+  .ucard{background:#fff; border:1px solid #e9e5dc; border-radius:22px; padding:28px; transition:transform .4s, box-shadow .4s;}
+  .ucard:hover{transform:translateY(-4px); box-shadow:0 18px 40px -20px rgba(0,0,0,.18);}
+  .ucard .ui{font-size:34px; color:var(--violet); margin-bottom:14px;}
+  .ucard h4{font-size:20px; font-weight:600; color:var(--ink); margin-bottom:8px; letter-spacing:-.3px;}
+  .ucard p{font-size:14px; line-height:1.75; color:#5a5768; font-weight:400;}
+
+  /* scroll-driven expanding use-case feed */
+  #usecases{background:var(--paper); color:var(--ink); padding:14vh 0 18vh;}
+  .ucwrap{max-width:880px; margin:0 auto; padding:0 28px;}
+  .ufeed{display:flex; flex-direction:column; gap:26px; margin-top:8vh;}
+  .uc{background:#fff; border:1px solid #e9e5dc; border-radius:26px; padding:30px 34px;
+    transform:scale(.93); opacity:.5; filter:saturate(.6);
+    transition:transform .6s cubic-bezier(.2,.7,.2,1), opacity .6s, box-shadow .6s, filter .6s;}
+  .uc.active{transform:scale(1); opacity:1; filter:none; box-shadow:0 30px 70px -28px rgba(60,58,140,.4); border-color:var(--violet-2);}
+  .uc .uhead{display:flex; align-items:center; gap:16px;}
+  .uc .uic{width:54px;height:54px;border-radius:16px;flex-shrink:0;display:grid;place-items:center;font-size:26px;color:#fff;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b));}
+  .uc h4{font-size:23px; font-weight:600; color:var(--ink); letter-spacing:-.4px;}
+  .uc .utag{font-size:12.5px; color:var(--muted); margin-top:3px;}
+  .uc .more{max-height:0; opacity:0; overflow:hidden; transition:max-height .7s ease, opacity .5s, margin .5s; margin-top:0;}
+  .uc.active .more{max-height:340px; opacity:1; margin-top:20px;}
+  .uc .more p{font-size:14.5px; line-height:1.8; color:#4a4856;}
+  .uc .toolrow{display:flex; flex-wrap:wrap; gap:9px; margin-top:18px;}
+  .uc .tool{display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:500;
+    padding:7px 14px 7px 8px; border-radius:13px; background:#f6f4ee; color:#3a3850; border:1px solid #e7e3d9;
+    transition:background .4s, border-color .4s, transform .25s;}
+  .uc.active .tool{background:#fff;}
+  .uc .tool:hover{transform:translateY(-2px); border-color:var(--violet-2);}
+  .uc .tool .ti{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:14px;flex-shrink:0;
+    background:linear-gradient(140deg, rgba(123,108,246,.16), rgba(232,121,185,.16)); color:var(--violet); filter:grayscale(1) brightness(.4);}
+  /* message-type + membership chips */
+  .mtype{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:500; padding:8px 14px; border-radius:999px;
+    background:rgba(123,108,246,.14); border:1px solid rgba(123,108,246,.3); color:var(--violet-2);}
+  .mtype.light{background:#fff; border:1px solid #e7e3d9; color:#46435a;}
+  /* event type selector */
+  .etypes{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:920px; margin:0 auto;}
+  .etype{background:#15131f; border:1px solid rgba(255,255,255,.09); border-radius:18px; padding:18px;
+    display:flex; flex-direction:column; gap:5px; transition:transform .35s, border-color .35s, background .35s; cursor:default;}
+  .etype:hover{transform:translateY(-4px); border-color:var(--violet-2); background:#1a1726;}
+  .etype .eti{font-size:26px; color:var(--violet-2); margin-bottom:4px;}
+  .etype b{font-size:15px; font-weight:600;}
+  .etype span{font-size:12px; color:#a7a4b8; line-height:1.55;}
+  .eformat{display:inline-flex; align-items:center; gap:9px; padding:10px 18px; border-radius:999px; font-size:14px; font-weight:500;
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.14);}
+  .eformat .efd{width:9px;height:9px;border-radius:50%;box-shadow:0 0 10px currentColor;}
+  /* growth loop + metrics */
+  .gstep{background:#fff;border:1px solid #e9e5dc;border-radius:18px;padding:18px 20px;text-align:center;min-width:150px;
+    display:flex;flex-direction:column;gap:4px;transition:transform .35s;}
+  .gstep:hover{transform:translateY(-4px);}
+  .gstep .gn{width:28px;height:28px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff;background:linear-gradient(140deg,var(--grad-a),var(--grad-b));}
+  .gstep b{font-size:16px;color:var(--ink);}
+  .gstep span{font-size:12px;color:#8a8575;}
+  .garrow{font-size:22px;color:var(--violet-2);}
+  .garrow.gloop{font-size:26px;animation:spin 6s linear infinite;}
+  .gmetric{background:#fff;border:1px solid #e9e5dc;border-radius:16px;padding:18px 14px;text-align:center;}
+  .gmetric .gv{font-size:30px;font-weight:700;letter-spacing:-1px;background:linear-gradient(120deg,var(--grad-a),var(--grad-b));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .gmetric .gl{font-size:12px;color:#6a6776;margin-top:4px;}
+  /* persona need cards (dark) */
+  .pneed{background:#15131f;border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:26px;transition:transform .4s,border-color .4s;}
+  .pneed:hover{transform:translateY(-5px);border-color:var(--violet-2);}
+  .pneed .pic{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;margin-bottom:16px;background:linear-gradient(140deg,var(--grad-a),var(--grad-b));}
+  .pneed .pic svg{width:26px;height:26px;}
+  .pneed h4{font-size:19px;font-weight:600;margin-bottom:8px;letter-spacing:-.3px;}
+  .pneed p{font-size:13.5px;line-height:1.75;color:#b9b7c6;font-weight:300;}
+  /* problem bubbles — refined floating chips with unread dot */
+  .bubble{box-shadow:0 10px 30px -12px rgba(0,0,0,.5);}
+  .bubble::after{content:'';position:absolute;top:-4px;inset-inline-start:-4px;width:9px;height:9px;border-radius:50%;background:#ff5a7a;box-shadow:0 0 10px #ff5a7a;}
+  @media(max-width:780px){ .gmetric{padding:14px 8px;} .gmetric .gv{font-size:24px;} .garrow{display:none;} #growth .wrap > div:nth-child(3){grid-template-columns:1fr 1fr !important;} }
+  .erow rv.d4{} /* events tools stagger */
+  .etypes.in .etype, .erow.in .ecard{animation:popIn .55s cubic-bezier(.2,.8,.2,1) both;}
+  .etypes.in .etype:nth-child(2){animation-delay:.06s} .etypes.in .etype:nth-child(3){animation-delay:.12s}
+  .etypes.in .etype:nth-child(4){animation-delay:.18s} .etypes.in .etype:nth-child(5){animation-delay:.24s} .etypes.in .etype:nth-child(6){animation-delay:.3s}
+  .erow.in .ecard:nth-child(2){animation-delay:.06s} .erow.in .ecard:nth-child(3){animation-delay:.12s}
+  .erow.in .ecard:nth-child(4){animation-delay:.18s} .erow.in .ecard:nth-child(5){animation-delay:.24s} .erow.in .ecard:nth-child(6){animation-delay:.3s}
+  @keyframes popIn{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+  @media(max-width:780px){ .etypes{grid-template-columns:1fr 1fr !important;} }
+  /* join-mode cards */
+  .jcard{background:#fff; border:1px solid #e9e5dc; border-radius:24px; padding:30px 26px; text-align:center;
+    transition:transform .4s, box-shadow .4s;}
+  .jcard:hover{transform:translateY(-5px); box-shadow:0 24px 50px -24px rgba(60,58,140,.35);}
+  .jcard .jic{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;margin:0 auto 16px;}
+  .jcard .jic svg{width:28px;height:28px;}
+  .jcard h4{font-size:21px;font-weight:600;color:var(--ink);margin-bottom:8px;letter-spacing:-.3px;}
+  .jcard p{font-size:13.5px;line-height:1.75;color:#5a5768;}
+  @media(max-width:780px){ #members .wrap > div:nth-child(2){grid-template-columns:1fr !important;} }
+  @media(max-width:780px){ .erow{grid-template-columns:1fr 1fr !important;} .uc{padding:24px;} .uc h4{font-size:19px;} }
+
+  /* phone mock */
+  .phone{position:absolute; inset-inline:50%; top:50%; transform:translate(50%,-50%); width:230px; height:480px;
+    background:#0a0913; border-radius:34px; border:7px solid #211f30; box-shadow:0 30px 70px -20px rgba(0,0,0,.7); padding:14px;}
+  .msg{margin-bottom:9px; max-width:78%; padding:9px 13px; border-radius:14px; font-size:12px; line-height:1.5;}
+  .msg.them{background:#211f30;}
+  .msg.us{background:linear-gradient(135deg,#1f8a5b,#22c79a); margin-inline-start:auto; border-bottom-left-radius:4px;}
+  .statbar{display:flex; gap:24px; flex-wrap:wrap; margin-top:26px;}
+  .stat .n{font-size:34px; font-weight:600; letter-spacing:-1px;}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  /* WALLET act */
+  .coin{width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #ffe9a8, var(--amber) 55%, #c98a1c);
+    box-shadow:0 20px 50px -12px rgba(246,185,72,.55), inset 0 -8px 16px rgba(0,0,0,.2);
+    display:grid; place-items:center; font-size:46px; margin:0 auto 30px;}
+
+  /* FINALE */
+  #finale .stage{background:radial-gradient(120% 90% at 50% 0%, rgba(108,92,231,.3), transparent 55%);}
+  .cta{display:inline-flex; align-items:center; gap:10px; padding:16px 30px; border-radius:999px; font-size:16px; font-weight:600;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); color:#fff; text-decoration:none; margin-top:30px;
+    box-shadow:0 20px 50px -14px rgba(108,92,231,.6); transition:transform .25s;}
+  .cta:hover{transform:translateY(-3px);}
+  .signoff{margin-top:40px; font-size:14px; color:var(--muted);}
+  @media(max-width:780px){
+    .wrap{padding:0 20px;}
+    .huge{font-size:clamp(34px,11vw,52px) !important;}
+    .big{font-size:clamp(27px,8vw,40px) !important;}
+    .lede{font-size:15px !important;}
+    .feat{grid-template-columns:1fr !important; gap:26px !important;}
+    .feat.flip .visual{order:-1;}
+    .statbar{gap:16px !important;}
+    .etypes{grid-template-columns:1fr 1fr !important;}
+    #members .wrap > div:nth-child(2), #persona .wrap > div:last-child, .erow{grid-template-columns:1fr !important;}
+    .gmetric .gv{font-size:22px !important;}
+    .uc{padding:20px !important;} .uc h4{font-size:18px !important;}
+    .pcard{flex:0 0 84vw !important; min-height:56vh; padding:28px !important;}
+    #brand{inset-inline-end:14px; top:14px;}
+    #stickyCta{font-size:13px; padding:11px 20px;}
+    .bubble{font-size:11px !important; padding:7px 11px !important;}
+    .orbit{width:230px; height:230px;}
+  }
+
+  .light{background:var(--paper); color:var(--ink);}
+  .light .lede{color:#4a4856;}
+  .light .kicker{color:var(--violet);}
+
+  @media(max-width:780px){
+    .feat{grid-template-columns:1fr; gap:30px;}
+    .feat.flip .visual{order:-1;}
+    .phone{width:180px;height:380px;}
+  }
+</style>
+</head>
+<body>
+<div id="rail"></div>
+<div id="brand"><img src="project/assets/mhwar-mark.svg" alt="محور" style="height:26px; display:block"/></div>
+<a id="stickyCta" href="https://mhwar.com/c/mhwar1" target="_blank" rel="noopener" style="position:fixed; bottom:22px; inset-inline-start:50%; transform:translateX(-50%) translateY(24px); z-index:260; opacity:0; pointer-events:none; transition:opacity .5s, transform .5s; display:inline-flex; align-items:center; gap:8px; padding:13px 26px; border-radius:999px; font-family:inherit; font-size:14px; font-weight:600; color:#fff; text-decoration:none; background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); box-shadow:0 16px 40px -12px rgba(108,92,231,.6);">انضمّ إلى مجتمع محور ←</a>
+
+<!-- ============ HERO ============ -->
+<section class="act" id="hero" style="height:140vh">
+  <div class="stage">
+    <div class="glow"></div><div class="glow2"></div>
+    <div class="wrap" style="text-align:center; position:relative">
+      <div class="orbit rv in">
+        <div class="ring r3"><span class="node"></span><span class="node alt"></span></div>
+        <div class="ring r2"><span class="node"></span><span class="node side"></span></div>
+        <div class="ring r1"><span class="node"></span><span class="node alt"></span></div>
+        <div class="mark"><img src="project/assets/mhwar-mark.svg" alt="محور" style="height:34px;display:block"/></div>
+      </div>
+      <div class="kicker rv in d1">منصّة إدارة المجتمعات والفعاليّات</div>
+      <h1 class="huge rv in d2">مجتمعك يستحقّ<br><span class="grad-text">أكثر من قروب.</span></h1>
+      <p class="lede rv in d3" style="margin:26px auto 0">اجمع جمهورك في مكان تملكه، أوصِل رسالتك عبر واتساب والبريد، وأدِر فعاليّاتك من الدعوة إلى الشهادة.<br>«محور» — المركز الذي يدور حوله كل ذلك.</p>
+    </div>
+    <div class="scrollcue">مرّر للأسفل<span class="arrow"></span></div>
+  </div>
+</section>
+
+<!-- ============ THE PROBLEM ============ -->
+<section class="act problem" id="problem" style="height:300vh">
+  <div class="stage">
+    <div class="bubbles">
+      <div class="bubble" style="top:18%; inset-inline-start:12%">📱 قروب واتساب آخر…</div>
+      <div class="bubble" style="top:30%; inset-inline-end:14%">📧 إيميل ضاع في الأرشيف</div>
+      <div class="bubble" style="top:62%; inset-inline-start:9%">🎟️ من سجّل في الفعالية؟</div>
+      <div class="bubble" style="top:72%; inset-inline-end:11%">📊 إكسل لا ينتهي</div>
+      <div class="bubble" style="top:45%; inset-inline-start:46%">🔕 رسالة وصلت متأخّرة</div>
+      <div class="bubble" style="top:14%; inset-inline-end:40%">😵‍💫 خمس أدوات مختلفة</div>
+    </div>
+    <div class="wrap" style="text-align:center">
+      <div class="kicker rv">المشكلة</div>
+      <h2 class="big rv d1">تبني جمهوراً…<br><span style="color:var(--muted)">ثم تفقده في الضجيج.</span></h2>
+      <p class="lede rv d2" style="margin:24px auto 0">قروبات تتكاثر بلا ذاكرة، رسائل لا أحد يفتحها، فعاليّات تُدار بإكسل ودعوات يدويّة،<br>وجمهورٌ تعِبت في جمعه… يتسرّب لأنّ صوتك لم يصله في الوقت المناسب.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO YOU ARE ============ -->
+<section class="act" id="persona" style="height:260vh">
+  <div class="stage">
+    <div class="wrap">
+      <div style="text-align:center; max-width:760px; margin:0 auto 44px">
+        <div class="kicker rv">لكنّك تعرف الحقيقة</div>
+        <h2 class="big rv d1">أنت لستَ شركة تقنية —<br><span class="grad-text">أنت من جمعَ الناس.</span></h2>
+        <p class="lede rv d2" style="margin:22px auto 0">أسّستَ جمعيّةً أو ناديًا أو مجلسًا يلتفّ حول فكرة تؤمن بها، والناس يثقون بك ويتبعونك. تستحقّ أدوات تخدمك، لا تحاربك.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:980px; margin:0 auto">
+        <div class="pneed rv d1">
+          <div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg></div>
+          <h4>أن يصِل صوته</h4><p>رسالةٌ واحدة مهمّة تضيع بين مئات الرسائل في قروبٍ لا أحد يقرؤه.</p>
+        </div>
+        <div class="pneed rv d2">
+          <div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M17 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87"/></svg></div>
+          <h4>أن يحفظ جمهوره</h4><p>قائمة أعضائه مبعثرة بين إكسل وهواتف وردود — يفقدها مع كل تغيير.</p>
+        </div>
+        <div class="pneed rv d3">
+          <div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg></div>
+          <h4>أن ينمو بثقة</h4><p>يريد التركيز على رسالته وأثره، لا على وصل خمس أدوات لا تتفاهم.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE SPARK ============ -->
+<section class="act spark" id="spark" style="height:220vh">
+  <div class="stage">
+    <div class="wrap" style="text-align:center">
+      <div class="kicker rv">اللحظة</div>
+      <h2 class="big rv d1">فماذا لو دارت<br><span class="grad-text">حول محورٍ واحد؟</span></h2>
+      <p class="lede rv d2" style="margin:24px auto 0">كل ما تبنيه — جمهورك، رسائلك، فعاليّاتك، محتواك —<br>يجتمع حول نقطة واحدة تملكها أنت. هنا يبدأ الإنقاذ.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ INTRODUCING ============ -->
+<section class="act" id="intro" style="height:160vh">
+  <div class="stage light">
+    <div class="wrap" style="text-align:center">
+      <div class="kicker rv">نُقدّم لكم</div>
+      <h2 class="huge rv d1">محور</h2>
+      <p class="lede rv d2" style="margin:22px auto 0; font-weight:400">المركز الذي يجمع جمهورك، محتواك، وفعاليّاتك في مكان واحد.<br>تبني مجتمعك · تحفظ جمهورك · تُوصِل رسالتك · فتكبر دائرتك.</p>
+      <div class="rv d3" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:28px">
+        <span class="mtype light">⚡ ابدأ خلال دقائق</span>
+        <span class="mtype light">🔒 بياناتك ملكك</span>
+        <span class="mtype light">🎁 جرّب مجّاناً ١٤ يوماً</span>
+        <span class="mtype light">✕ بدون بطاقة ائتمان</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PATTERNS (horizontal drag) ============ -->
+<section class="act" id="patterns" style="height:420vh">
+  <div class="stage" style="display:block">
+    <div style="position:absolute; top:11vh; inset-inline:0; text-align:center; z-index:5">
+      <div class="kicker">الأساس</div>
+      <h2 class="big">ثلاثة أنماط. مجتمع واحد.</h2>
+    </div>
+    <div style="position:absolute; top:50%; transform:translateY(-50%); inset-inline:0">
+      <div class="track" id="ptrack">
+        <div class="pcard" style="background:linear-gradient(160deg,#1c2d4a,#101a2e)">
+          <div class="ico">◇</div>
+          <div><div class="pno">٠١ — OPEN</div><h3>مفتوح</h3>
+          <p>تسجيل عام، نشرات للجمهور الواسع، صفحات هبوط مفتوحة. مثاليّ للفعاليات العامّة وحملات التوعية.</p>
+          <ul><li>صفحات هبوط للفعاليات</li><li>نشرات بريدية للجمهور</li><li>نموّ بلا حدود</li></ul></div>
+        </div>
+        <div class="pcard" style="background:linear-gradient(160deg,#3a1c4a,#220f2e)">
+          <div class="ico">◈</div>
+          <div><div class="pno">٠٢ — CLOSED</div><h3>مغلق</h3>
+          <p>عضويّة بدعوة، محاضر وقرارات موثّقة، قنوات رسميّة. للمجالس والجمعيّات المهنيّة واللجان.</p>
+          <ul><li>جلسات ومحاضر</li><li>تصويت موثّق</li><li>قنوات رسميّة معتمدة</li></ul></div>
+        </div>
+        <div class="pcard" style="background:linear-gradient(160deg,#1c4a3a,#0f2e22)">
+          <div class="ico">⬡</div>
+          <div><div class="pno">٠٣ — HYBRID</div><h3>هجين</h3>
+          <p>نواة مغلقة للأعضاء + طبقة عامّة للفعاليات والنشرات. للغرف التجاريّة والتجمّعات القطاعيّة.</p>
+          <ul><li>عضويّة خاصّة + فعاليات عامّة</li><li>مرونة كاملة</li><li>الأفضل للنموّ المتدرّج</li></ul></div>
+        </div>
+        <div class="pcard" style="background:linear-gradient(160deg,#2a2540,#14111f); border-style:dashed">
+          <div class="ico grad-text">✦</div>
+          <div><div class="pno">والأجمل</div><h3>تختار النمط<br>ويعمل فوراً</h3>
+          <p>كل نمط يحمل قواعده وقوالبه جاهزة لحظة تفعيله. لا إعدادات معقّدة — فقط اختَر وابدأ.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="hint">← مرّر لاستكشاف الأنماط</div>
+  </div>
+</section>
+
+<!-- ============ COMMUNITY MANAGEMENT & MEMBERSHIP ============ -->
+<section class="act" id="members" style="height:240vh">
+  <div class="stage light">
+    <div class="wrap">
+      <div style="text-align:center; max-width:760px; margin:0 auto 44px">
+        <div class="kicker rv">إدارة المجتمع</div>
+        <h2 class="big rv d1">أنت تتحكّم<br><span class="grad-text">بمن ينضمّ.</span></h2>
+        <p class="lede rv d2" style="margin:22px auto 0; color:#4a4856">أضِف أعضاءك، نظّم عضويّاتهم، واختر كيف ينضمّ الناس إلى مجتمعك — بابٌ مفتوح، دائرةٌ خاصّة، أو انضمامٌ بموافقتك.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:980px; margin:0 auto">
+        <div class="jcard rv d1">
+          <div class="jic" style="background:linear-gradient(140deg,#22c79a,#1f8a5b)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+          <h4>مفتوح</h4>
+          <p>أي شخص ينضمّ فوراً عبر رابط أو صفحة. مثاليّ للنموّ السريع والجمهور العام.</p>
+        </div>
+        <div class="jcard rv d2">
+          <div class="jic" style="background:linear-gradient(140deg,#7b6cf6,#5a4ad1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M7 11V8a5 5 0 0110 0v3"/><rect x="5" y="11" width="14" height="9" rx="2"/></svg></div>
+          <h4>خاصّ</h4>
+          <p>بدعوة فقط. دائرة مغلقة للأعضاء المعتمدين — مجالس، لجان، وروابط خاصّة.</p>
+        </div>
+        <div class="jcard rv d3">
+          <div class="jic" style="background:linear-gradient(140deg,#f6b948,#d98a1c)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M20 6L9 17l-5-5"/></svg></div>
+          <h4>بموافقة</h4>
+          <p>يطلب الشخص الانضمام، وتوافق أنت. توازنٌ بين الانفتاح والتحكّم في من يدخل.</p>
+        </div>
+      </div>
+      <div class="rv d3" style="max-width:980px; margin:18px auto 0; display:flex; flex-wrap:wrap; gap:10px; justify-content:center">
+        <span class="mtype light">👥 إضافة الأعضاء واستيرادهم</span>
+        <span class="mtype light">🏷️ مستويات عضويّة (مجانيّة/مدفوعة)</span>
+        <span class="mtype light">🛡️ أدوار وصلاحيّات</span>
+        <span class="mtype light">✅ طلبات الانضمام والموافقات</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHATSAPP FIRST ============ -->
+<section class="act" id="whatsapp" style="height:200vh">
+  <div class="stage">
+    <div class="wrap">
+      <div class="feat">
+        <div class="rv">
+          <div class="chip">⌬ التواصل والإرسال</div>
+          <h2 class="big">لكل رسالة…<br>قناتها الصحيحة.</h2>
+          <p class="lede" style="margin-top:18px">تذكير قبل فعاليّة، دعوة لحدث، خبر عاجل، نشرة شهريّة، أو شهادة إتمام — لكلٍّ منها شكلها وتوقيتها. ومحور توصلها عبر القناتين الأقوى من لوحة واحدة.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 6px">
+            <span class="mtype">🔔 تذكير</span><span class="mtype">🎫 دعوة</span><span class="mtype">📣 خبر عاجل</span><span class="mtype">🗞️ نشرة</span><span class="mtype">🏅 شهادة</span>
+          </div>
+          <div class="statbar">
+            <div class="stat"><div class="n grad-text">واتساب</div><div class="l">تنبيهات تصل وتُقرأ فوراً</div></div>
+            <div class="stat"><div class="n grad-text">البريد</div><div class="l">نشرات ومحتوى وشهادات</div></div>
+          </div>
+        </div>
+        <div class="visual rv d2" style="display:grid; place-items:center">
+          <div style="display:flex; gap:14px; align-items:center; width:86%">
+            <div class="phone" style="position:relative; inset:auto; transform:none; width:170px; height:330px; flex-shrink:0">
+              <div style="font-size:10px;color:#22c79a;margin-bottom:8px">● واتساب</div>
+              <div class="msg them" style="font-size:11px">تذكير: ملتقاكم غداً ٧م 🔔</div>
+              <div class="msg us" style="font-size:11px">تم ✅</div>
+              <div class="msg them" style="font-size:11px">تذكرتك بالـ QR 🎟️</div>
+            </div>
+            <div style="flex:1; background:#fff; border-radius:16px; border:1px solid #e6e3dc; padding:14px; color:var(--ink)">
+              <div style="font-size:10px;color:#6c5ce7;margin-bottom:8px">✉ البريد</div>
+              <div style="font-weight:600;font-size:13px;margin-bottom:4px">نشرة المجتمع · أكتوبر</div>
+              <div style="font-size:11px;color:#8a8575;line-height:1.6">أبرز ما حدث، الفعاليّة القادمة، وقصص من أعضائكم…</div>
+              <div style="margin-top:10px;height:6px;background:#f0ede5;border-radius:3px"></div>
+              <div style="margin-top:6px;height:6px;width:70%;background:#f0ede5;border-radius:3px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHO IT'S FOR ============ -->
+<!-- ============ WHO IT'S FOR (scroll-expanding feed) ============ -->
+<section class="act" id="usecases">
+  <div class="ucwrap">
+    <div style="text-align:center; max-width:760px; margin:0 auto">
+      <div class="kicker rv">لمن صُنعت محور</div>
+      <h2 class="big rv d1">إن كنتَ تجمع الناس…<br><span class="grad-text">فمحور لك.</span></h2>
+      <p class="lede rv d2" style="margin:22px auto 0; color:#4a4856">مهما اختلف مجالك، إن كان حولك جمهور تريد أن تبقى على تواصل معه — مرّر ببطء، ودع كل قصّة تتّضح.</p>
+    </div>
+    <div class="ufeed">
+      <div class="uc"><div class="uhead"><div class="uic">♥</div><div><h4>المنظّمات غير الربحيّة</h4><div class="utag">جمعيّات خيريّة ومؤسّسات أهليّة</div></div></div>
+        <div class="more"><p>تعتمدون على المتطوّعين والمتبرّعين، لكن التواصل مبعثر ورسائلكم تضيع وتفاعلهم يبرد. محور تُبقيكم على صلة دائمة — حملات ونشرات ودعوات تصل فعلاً وتُقرأ، مع قياس الأثر وتوثيق المشاركة.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">📣</span>حملات واتساب + بريد</span><span class="tool"><span class="ti">🎟️</span>دعوات الفعاليّات</span><span class="tool"><span class="ti">📰</span>نشرات الأثر</span><span class="tool"><span class="ti">📊</span>قياس التفاعل</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">★</div><div><h4>الأندية الطلابيّة والجامعيّة</h4><div class="utag">مجتمع نشِط رغم تغيّر الأعضاء</div></div></div>
+        <div class="more"><p>الأندية تنبض بالنشاط، لكن الأعضاء يتغيّرون كل فصل والتواصل يعتمد على قروب يضيع فيه كل شيء. محور تمنح ناديكم مساحة منظّمة: تسجيل أعضاء، فعاليّات وورش، إعلانات فوريّة، ونشرة تُبقي الطلاب متّصلين.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">📝</span>تسجيل الأعضاء</span><span class="tool"><span class="ti">🎓</span>فعاليّات وورش</span><span class="tool"><span class="ti">📢</span>إعلانات فوريّة</span><span class="tool"><span class="ti">📬</span>نشرة النادي</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">⬡</div><div><h4>مجتمعات الشركات والعلامات</h4><div class="utag">حوّل المهتمّين إلى مجتمع تملكه</div></div></div>
+        <div class="more"><p>جمهوركم المهتمّ بالعلامة مبعثر بين إنستغرام وقروب واتساب وقائمة بريد قديمة — لا تملكون أيّاً منها فعلاً. محور تحفظ جمهوركم في مكان واحد تملكونه، وتوصلكم به بالأخبار والتحديثات والعروض.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">👥</span>قائمة جمهور محفوظة</span><span class="tool"><span class="ti">📰</span>نشرات دوريّة</span><span class="tool"><span class="ti">🎁</span>أخبار وعروض</span><span class="tool"><span class="ti">🎯</span>شرائح مستهدفة</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">◈</div><div><h4>المجتمعات المهنيّة المتخصّصة</h4><div class="utag">تجمّعات الممارسين والخبراء</div></div></div>
+        <div class="more"><p>تجمعون ممارسين وخبراء يبحثون عن المعرفة والفرص، وربّما تديرون برامج تدريب ودفعات — لكن النقاش يتشتّت واللقاءات تُدار يدويّاً. محور تنظّم مجتمعكم المهني: عضويّات، لقاءات وورش، دفعات تدريبيّة بجداولها، وشهادات حضور وإتمام موثّقة.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">🎫</span>عضويّات منظّمة</span><span class="tool"><span class="ti">🎓</span>لقاءات وورش</span><span class="tool"><span class="ti">📚</span>دفعات تدريبيّة</span><span class="tool"><span class="ti">🏅</span>شهادات إتمام</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">⬣</div><div><h4>المجالس الأسريّة والروابط</h4><div class="utag">تواصل منظّم للعوائل الكبيرة</div></div></div>
+        <div class="more"><p>العوائل الكبيرة والروابط تحتاج تواصلاً منظّماً — مناسبات، أخبار، وصناديق عائليّة — يضيع كلّه في قروبات متفرّقة. محور تمنح رابطتكم مساحة خاصّة: دعوات المناسبات، نشرة العائلة، وتسجيل منظّم للأفراد.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">🎉</span>دعوات المناسبات</span><span class="tool"><span class="ti">📬</span>نشرة العائلة</span><span class="tool"><span class="ti">📒</span>سجلّ الأفراد</span><span class="tool"><span class="ti">🔔</span>إعلانات خاصّة</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">◇</div><div><h4>الديوانيّات والمبادرات المحليّة</h4><div class="utag">مجالس ثقافيّة واجتماعيّة دوريّة</div></div></div>
+        <div class="more"><p>الديوانيّات والمبادرات تلتقي بانتظام وتعتمد على الحضور والتفاعل، لكن الدعوة والتذكير والمتابعة عبء يدويّ. محور تؤتمت اللقاء الدوري: دعوة، تأكيد حضور، تذكير، وأرشيف لما يُطرح في كل جلسة.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">🗓️</span>لقاءات دوريّة</span><span class="tool"><span class="ti">✅</span>تأكيد حضور</span><span class="tool"><span class="ti">⏰</span>تذكيرات آليّة</span><span class="tool"><span class="ti">📁</span>أرشيف الجلسات</span></div></div>
+      </div>
+      <div class="uc"><div class="uhead"><div class="uic">✦</div><div><h4>المجموعات والهوايات المستقلّة</h4><div class="utag">تجمّعات حرّة حول شغف مشترك</div></div></div>
+        <div class="more"><p>تجمعكم هواية أو شغف — رياضة، فنّ، قراءة — بلا كيان رسميّ، فقط مجموعة تريد أن تنظّم لقاءاتها وتنمو. محور تمنحكم البساطة: صفحة للمجموعة، تسجيل، فعاليّات، وتواصل يُبقي الجميع على الموعد.</p>
+          <div class="toolrow"><span class="tool"><span class="ti">🌐</span>صفحة المجموعة</span><span class="tool"><span class="ti">⚡</span>تسجيل سريع</span><span class="tool"><span class="ti">🎯</span>لقاءات وأنشطة</span><span class="tool"><span class="ti">⏰</span>تذكيرات الموعد</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EVENTS ============ -->
+<section class="act" id="events" style="height:auto">
+  <div class="stage" style="position:relative; height:auto; min-height:auto; overflow:visible; display:block; padding:14vh 0 12vh">
+    <div class="wrap">
+      <div style="text-align:center; margin-bottom:30px">
+        <div class="kicker rv">أدوات الفعاليات</div>
+        <h2 class="big rv d1">فعاليّة من أيّ نوع.<br>تُدار من البداية.</h2>
+        <p class="lede rv d2" style="margin:18px auto 0">ابدأ باختيار نوع فعاليّتك وصيغتها — ومحور تجهّز كل ما بعدها تلقائيّاً.</p>
+      </div>
+
+      <!-- STEP 1: type -->
+      <div class="rv d2" style="text-align:center; font-size:12px; letter-spacing:2px; color:var(--violet-2); margin-bottom:14px">① اختر النوع</div>
+      <div class="etypes rv d2">
+        <div class="etype"><span class="eti">◴</span><b>دورة / ورشة عمل</b><span>تعليم وتطبيق لتطوير المهارات</span></div>
+        <div class="etype"><span class="eti">◈</span><b>ندوة / ملتقى</b><span>متحدّثون وخبراء ونقاش متخصّص</span></div>
+        <div class="etype"><span class="eti">⬡</span><b>لقاء / جلسة تواصل</b><span>بناء علاقات وتوسيع الشبكة</span></div>
+        <div class="etype"><span class="eti">◷</span><b>اجتماع دوري</b><span>جلسة تنظيميّة مغلقة للقرارات</span></div>
+        <div class="etype"><span class="eti">⛰</span><b>رحلة / نشاط ميداني</b><span>نشاط حركيّ خارج القاعات</span></div>
+        <div class="etype"><span class="eti">◇</span><b>بطولة / منافسة</b><span>تحدّيات حركيّة أو رقميّة بين الأعضاء</span></div>
+      </div>
+
+      <!-- STEP 2: format -->
+      <div class="rv d3" style="text-align:center; font-size:12px; letter-spacing:2px; color:var(--violet-2); margin:30px 0 14px">② حدّد الصيغة</div>
+      <div class="rv d3" style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap">
+        <span class="eformat"><span class="efd" style="background:#22c79a"></span>حضوريّة</span>
+        <span class="eformat"><span class="efd" style="background:#7b6cf6"></span>أونلاين</span>
+        <span class="eformat"><span class="efd" style="background:#f6b948"></span>هجينة</span>
+      </div>
+
+      <!-- STEP 3: tools -->
+      <div class="rv d4" style="text-align:center; font-size:12px; letter-spacing:2px; color:var(--violet-2); margin:30px 0 14px">③ ومحور تتكفّل بالباقي</div>
+      <div class="erow rv d4" style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px">
+        <div class="ecard"><div class="en">٠١</div><h4>صفحة ودعوات</h4><p>صفحة هبوط بهويّتك + دعوات تُرسل عبر واتساب والبريد بضغطة.</p></div>
+        <div class="ecard"><div class="en">٠٢</div><h4>تأكيد حضور (RSVP)</h4><p>تأكيدٌ بنقرة يتحوّل فوراً إلى تذكرة — مع إدارة المقاعد وقوائم الانتظار.</p></div>
+        <div class="ecard"><div class="en">٠٣</div><h4>تذكرة QR أو رابط دخول</h4><p>تذكرة QR للحضوريّة، أو رابط بثّ خاصّ للأونلاين — لكلّ صيغة أداتها.</p></div>
+        <div class="ecard"><div class="en">٠٤</div><h4>تذكيرات مؤتمتة</h4><p>قبل يوم · قبل ساعتين · عند البدء — تُرسل تلقائيّاً بلا تدخّل منك.</p></div>
+        <div class="ecard"><div class="en">٠٥</div><h4>تسجيل دخول وحضور</h4><p>امسح الـ QR عند الباب أو تابع حضور الأونلاين — لحظيّاً.</p></div>
+        <div class="ecard"><div class="en">٠٦</div><h4>شهادات + استبيان</h4><p>استبيان بعدي سريع، ثم شهادة بهويّتك ورمز تحقّق تُصدَر آليّاً.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMUNITY PULSE — posts / news / surveys / discussions ============ -->
+<section class="act" id="pulse" style="height:230vh">
+  <div class="stage">
+    <div class="wrap">
+      <div class="feat">
+        <div class="rv">
+          <div class="chip">◉ نبض المجتمع</div>
+          <h2 class="big">مجتمعك حيّ.<br>وله صوت.</h2>
+          <p class="lede" style="margin-top:18px">لا تكتفِ بالإرسال في اتجاه واحد. انشر الأخبار والمنشورات، أطلق استبياناً يقيس الرأي، أو افتح نقاشاً يتفاعل فيه أعضاؤك — كل ذلك في مساحة مجتمعك المنظّمة، بعيداً عن فوضى القروبات.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:18px">
+            <span class="mtype">📰 أخبار ومنشورات</span><span class="mtype">📊 استبيانات</span><span class="mtype">💬 نقاشات</span><span class="mtype">📌 إعلانات مثبّتة</span>
+          </div>
+        </div>
+        <div class="visual rv d2" style="display:grid; place-items:center; background:#14121f">
+          <div style="width:82%; display:flex; flex-direction:column; gap:11px">
+            <div style="background:#1b1928;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 15px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="width:24px;height:24px;border-radius:50%;background:linear-gradient(140deg,var(--grad-a),var(--grad-b));display:inline-block"></span><b style="font-size:12px">إعلان · فريق محور</b><span style="margin-inline-start:auto;font-size:10px;color:var(--muted)">📌</span></div>
+              <div style="font-size:12px;color:#c9c7d6;line-height:1.6">لقاؤنا الشهري الجمعة القادمة — سجّلوا الآن 🎉</div>
+            </div>
+            <div style="background:#1b1928;border:1px solid rgba(108,92,231,.3);border-radius:14px;padding:13px 15px">
+              <div style="font-size:11px;color:var(--violet-2);margin-bottom:9px">📊 استبيان · ما موضوع الورشة القادمة؟</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="position:relative;background:#26223a;border-radius:7px;height:24px;overflow:hidden"><div style="position:absolute;inset:0;width:62%;background:linear-gradient(90deg,var(--grad-a),var(--grad-b));opacity:.5"></div><span style="position:relative;font-size:10.5px;line-height:24px;padding-inline-start:10px">التصميم · 62%</span></div>
+                <div style="position:relative;background:#26223a;border-radius:7px;height:24px;overflow:hidden"><div style="position:absolute;inset:0;width:38%;background:#3a3550"></div><span style="position:relative;font-size:10.5px;line-height:24px;padding-inline-start:10px">البرمجة · 38%</span></div>
+              </div>
+            </div>
+            <div style="background:#1b1928;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 15px">
+              <div style="font-size:11px;color:#22c79a;margin-bottom:6px">💬 نقاش · 14 ردّاً</div>
+              <div style="font-size:12px;color:#c9c7d6;line-height:1.6">«ما أفضل وقت للقاءات؟» — تفاعل الأعضاء…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GROWTH / NEWSLETTERS ============ -->
+<section class="act" id="growth" style="height:auto">
+  <div class="stage light" style="position:relative; height:auto; min-height:auto; overflow:visible; display:block; padding:16vh 0 14vh">
+    <div class="wrap">
+      <div style="text-align:center; max-width:720px; margin:0 auto 50px">
+        <div class="chip rv" style="background:rgba(108,92,231,.12)">▤ المحتوى والنمو</div>
+        <h2 class="big rv d1">كل رسالة…<br><span class="grad-text">تُنبت العضو التالي.</span></h2>
+        <p class="lede rv d2" style="margin:20px auto 0; color:#4a4856">المجتمع الذي لا يُغذّى يذبل. محور تحوّل تواصلك إلى دورة نموّ ذاتيّة: محتوى يبقي الناس، تفاعل يجذب غيرهم، وأعضاء جدد يبدؤون الدورة من جديد.</p>
+      </div>
+      <!-- growth loop -->
+      <div class="rv d2" style="display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; max-width:960px; margin:0 auto 40px">
+        <div class="gstep"><span class="gn">١</span><b>انشر</b><span>نشرة · خبر · استبيان</span></div>
+        <span class="garrow">→</span>
+        <div class="gstep"><span class="gn">٢</span><b>تفاعل</b><span>فتح · ردّ · مشاركة</span></div>
+        <span class="garrow">→</span>
+        <div class="gstep"><span class="gn">٣</span><b>ينضمّ غيرهم</b><span>عبر دعوة عضو لعضو</span></div>
+        <span class="garrow gloop">↻</span>
+      </div>
+      <!-- live metrics -->
+      <div class="rv d3" style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; max-width:920px; margin:0 auto">
+        <div class="gmetric"><div class="gv">٨٧٪</div><div class="gl">معدّل فتح النشرة</div></div>
+        <div class="gmetric"><div class="gv">+٣١٠</div><div class="gl">عضو جديد هذا الشهر</div></div>
+        <div class="gmetric"><div class="gv">٤٢٪</div><div class="gl">تفاعل شهريّ</div></div>
+        <div class="gmetric"><div class="gv">×٣</div><div class="gl">نموّ خلال ٦ أشهر</div></div>
+      </div>
+      <p class="rv d3" style="text-align:center; font-size:12.5px; color:#8a8575; margin-top:22px">نشرات دوريّة لكل مجتمع · رحلات تواصل تتفرّع حسب سلوك كل عضو · قياس أثر يوضّح ما ينجح.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WALLET / FAIR BILLING ============ -->
+<section class="act" id="wallet" style="height:200vh">
+  <div class="stage">
+    <div class="wrap" style="text-align:center">
+      <div class="coin rv">◎</div>
+      <div class="kicker rv d1">فوترة عادلة</div>
+      <h2 class="big rv d2">اشتراك للميزات.<br>محفظة لرسائلك.</h2>
+      <p class="lede rv d3" style="margin:22px auto 0">نظام هجين عادل: تدفع اشتراكاً ثابتاً للقدرات، وتستخدم محفظة رقميّة مرنة تدفع فيها فقط مقابل ما ترسله فعلاً. بلا مفاجآت، بلا هدر.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINALE ============ -->
+<section class="act" id="finale" style="height:130vh">
+  <div class="stage">
+    <div class="wrap" style="text-align:center; position:relative; z-index:2">
+      <div class="mark rv" style="width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(140deg,var(--grad-a),var(--grad-b));margin:0 auto 24px;font-size:32px;font-weight:700">م</div>
+      <div class="kicker rv d1">والآن دوركم</div>
+      <h2 class="huge rv d2">كونوا أوّل<br><span class="grad-text">من يدور معنا.</span></h2>
+      <p class="lede rv d3" style="margin:22px auto 0">بنيت محور لتكون المركز الذي تدور حوله المجتمعات وتتحوّل إلى أثر حقيقي.<br>وأنتم — أصدقائي والمقرّبون — أوّل من أشاركهم البداية. 🤍</p>
+      <a class="cta rv d4" href="https://mhwar.com/c/mhwar1" target="_blank" rel="noopener">انضمّ إلى مجتمع محور ←</a>
+      <div class="signoff rv d4">mhwar.com/c/mhwar1 · صُنع بشغف · محور Mhwar · ٢٠٢٦</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // progress rail + brand
+  const rail = document.getElementById('rail');
+  const brand = document.getElementById('brand');
+  function onScroll(){
+    const h = document.documentElement.scrollHeight - innerHeight;
+    const p = Math.min(1, scrollY / h);
+    rail.style.width = (p*100)+'%';
+    brand.classList.toggle('show', scrollY > innerHeight*0.6);
+    var sc=document.getElementById('stickyCta'); if(sc){ var on=scrollY>innerHeight*1.4 && scrollY < (document.documentElement.scrollHeight-innerHeight*1.6); sc.style.opacity=on?'1':'0'; sc.style.pointerEvents=on?'auto':'none'; sc.style.transform='translateX(-50%) translateY('+(on?0:24)+'px)'; }
+    drivePatterns();
+    driveUsecases();
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('resize', onScroll);
+
+  // reveal observer
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  }, {threshold:.18});
+  document.querySelectorAll('.rv:not(.in)').forEach(el=>io.observe(el));
+
+  // problem bubbles lit when section centered
+  const problem = document.getElementById('problem');
+  const io2 = new IntersectionObserver((entries)=>{
+    entries.forEach(e=> e.target.classList.toggle('lit', e.isIntersecting));
+  }, {threshold:.4});
+  io2.observe(problem);
+
+  // horizontal drag-scroll for patterns, driven by vertical scroll progress
+  const patterns = document.getElementById('patterns');
+  const track = document.getElementById('ptrack');
+  const ucards = [...document.querySelectorAll('.uc')];
+  function driveUsecases(){
+    const cy = innerHeight/2;
+    let best=null, bestD=1e9;
+    ucards.forEach(c=>{ const r=c.getBoundingClientRect(); const d=Math.abs((r.top+r.bottom)/2 - cy); if(d<bestD){bestD=d; best=c;} });
+    ucards.forEach(c=> c.classList.toggle('active', c===best && bestD < innerHeight*0.55));
+  }
+  function drivePatterns(){
+    const rect = patterns.getBoundingClientRect();
+    const total = patterns.offsetHeight - innerHeight;
+    const passed = Math.min(Math.max(-rect.top,0), total);
+    const prog = total>0 ? passed/total : 0;          // 0..1
+    const max = track.scrollWidth - innerWidth*0.92;
+    // RTL: move track to the negative (content slides in from the start side)
+    track.style.transform = 'translateX('+ (prog*max) +'px)';
+  }
+  onScroll();
+</script>
+</body>
+</html>
