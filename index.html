@@ -283,6 +283,11 @@
   .stage.light::before, #usecases::before{ top:0;    background:linear-gradient(180deg, var(--ink), transparent); }
   .stage.light::after,  #usecases::after{  bottom:0; background:linear-gradient(0deg,   var(--ink), transparent); }
 
+  /* Sticky join-CTA: the inline `inset-inline-start:50%` mis-centers in RTL —
+     combined with the JS translateX(-50%) it drifts off the start edge and clips.
+     Anchor with left:50% so it stays perfectly centred in both directions. */
+  #stickyCta{ inset-inline-start:auto !important; right:auto !important; left:50% !important; max-width:calc(100vw - 28px); }
+
   /* ============================================================
      MOBILE-FIRST REFINEMENTS  (≤ 780px)
      ============================================================ */
@@ -298,15 +303,18 @@
 
     /* -- (5) Tighter vertical rhythm: shorter sticky heights + less
           padding = far less empty scrolling between beats -- */
-    #problem{ height:210vh !important; }
-    #persona{ height:190vh !important; }
-    #spark{   height:150vh !important; }
-    #intro{   height:130vh !important; }
-    #whatsapp{height:160vh !important; }
-    #pulse{   height:175vh !important; }
-    #wallet{  height:150vh !important; }
+    #problem{ height:155vh !important; }
+    #persona{ height:155vh !important; }
+    #members{ height:175vh !important; }
+    #spark{   height:112vh !important; }
+    #intro{   height:112vh !important; }
+    #whatsapp{height:150vh !important; }
+    #pulse{   height:160vh !important; }
+    #wallet{  height:118vh !important; }
     #usecases{ padding:8vh 0 10vh !important; }
     #growth .stage{ padding:9vh 0 8vh !important; }
+    /* keep the floating brand legible over any background (no white-on-white overlap) */
+    #brand{ background:rgba(12,11,20,.66); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); padding:6px 10px; border-radius:12px; }
 
     /* -- (1) #usecases → native horizontal carousel, all cards open -- */
     #usecases .ucwrap{ padding:0 16px; }
