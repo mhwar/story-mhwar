@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>محور · في العُمق</title>
+<meta name="description" content="انزل إلى عُمق محور — رحلة من السطح الفوضوي إلى قلب مجتمعك: جمهورك، رسالتك، فعاليتك، أثرك.">
+<meta name="theme-color" content="#faf9f6">
+<meta property="og:title" content="محور · في العُمق">
+<meta property="og:description" content="رحلة تفاعلية إلى قلب محور — اجمع جمهورك، أوصِل رسالتك، أدِر فعاليتك، واصنع أثرك.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mhwar.github.io/story-mhwar/v2.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0c0b14; --ink-soft:#3a3744; --muted:#76737f;
+    --paper:#f5f3ef; --paper-2:#faf9f6; --line:#e9e5db; --card:#ffffff;
+    --violet:#6c5ce7; --violet-2:#a29bfe; --grad-a:#7b6cf6; --grad-b:#e879b9;
+    --green:#22c79a; --amber:#f6b948;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper-2); color:var(--ink);
+    font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  ::selection{background:var(--violet); color:#fff;}
+  a{color:inherit;}
+
+  /* ---------- typography ---------- */
+  .kicker{font-size:13px; color:var(--violet); font-weight:600; margin-bottom:16px;}
+  h1,h2{font-weight:600; line-height:1.05; letter-spacing:-.4px;}
+  .display{font-size:clamp(40px,8.4vw,98px);}
+  .big{font-size:clamp(30px,5.6vw,64px);}
+  .lede{font-size:clamp(16.5px,2.2vw,23px); color:var(--ink-soft); line-height:1.75; font-weight:300; max-width:640px;}
+  .grad{background:linear-gradient(118deg,var(--grad-a),var(--grad-b)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  .label{display:inline-flex; align-items:center; gap:9px; font-size:13px; font-weight:600; color:var(--violet);
+    padding:7px 14px; border-radius:999px; background:rgba(108,92,231,.08); border:1px solid rgba(108,92,231,.18); margin-bottom:22px;}
+  .label .n{font-family:'IBM Plex Mono',monospace; opacity:.7;}
+
+  /* ---------- scene scaffold ---------- */
+  .scene{position:relative; min-height:100svh; display:flex; align-items:center; overflow:hidden; padding:13vh 0;}
+  .wrap{width:100%; max-width:1040px; margin:0 auto; padding:0 28px; position:relative; z-index:2;}
+  .glow{position:absolute; border-radius:50%; filter:blur(46px); pointer-events:none; z-index:0; will-change:transform;}
+
+  /* reveal on scroll */
+  .rv{opacity:0; transform:translateY(28px); transition:opacity 1s cubic-bezier(.16,.7,.2,1), transform 1s cubic-bezier(.16,.7,.2,1);}
+  .rv.in{opacity:1; transform:none;}
+  .d1{transition-delay:.06s;} .d2{transition-delay:.12s;} .d3{transition-delay:.18s;} .d4{transition-delay:.26s;} .d5{transition-delay:.34s;}
+
+  /* ---------- depth rail (desktop) ---------- */
+  #rail{position:fixed; inset-inline-start:26px; top:50%; transform:translateY(-50%); z-index:60;
+    display:flex; flex-direction:column; gap:26px; padding:8px 0;}
+  #rail::before{content:''; position:absolute; inset-inline-start:5px; top:6px; bottom:6px; width:2px; background:var(--line);}
+  #rail .fill{position:absolute; inset-inline-start:5px; top:6px; width:2px; height:0; border-radius:2px;
+    background:linear-gradient(var(--grad-a),var(--grad-b)); transition:height .25s ease;}
+  #rail .stop{position:relative; display:flex; align-items:center; gap:11px; text-decoration:none; cursor:pointer; z-index:1;}
+  #rail .stop i{width:12px; height:12px; border-radius:50%; background:#fff; border:2px solid var(--line);
+    flex-shrink:0; transition:transform .3s, border-color .3s, background .3s, box-shadow .3s;}
+  #rail .stop b{font-size:12.5px; font-weight:500; color:var(--muted); white-space:nowrap;
+    opacity:.55; transform:translateX(-4px); transition:opacity .3s, color .3s, transform .3s;}
+  #rail .stop.on i{border-color:var(--violet); background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); box-shadow:0 0 0 5px rgba(108,92,231,.12);}
+  #rail .stop.on b{opacity:1; color:var(--ink); transform:none; font-weight:600;}
+
+  /* depth rail (mobile top bar) */
+  #topbar{position:fixed; inset-inline:0; top:0; z-index:60; display:none; align-items:center; gap:12px;
+    padding:10px 16px; background:rgba(250,249,246,.82); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); border-bottom:1px solid var(--line);}
+  #topbar .track{flex:1; height:3px; border-radius:3px; background:var(--line); overflow:hidden;}
+  #topbar .pf{display:block; height:100%; width:0; border-radius:3px; background:linear-gradient(90deg,var(--grad-a),var(--grad-b)); transition:width .2s linear;}
+  #topbar .lbl{font-size:12.5px; font-weight:600; color:var(--ink); min-width:54px; text-align:start;}
+  #topbar .mk{height:18px; opacity:.9;}
+
+  /* floating brand (desktop) */
+  #brand{position:fixed; top:22px; inset-inline-end:28px; z-index:55; display:flex; align-items:center; gap:8px;
+    opacity:0; transition:opacity .5s; pointer-events:none;}
+  #brand.show{opacity:1;}
+  #brand img{height:24px; display:block;}
+
+  /* ---------- SURFACE / hero ---------- */
+  #surface .mark{width:78px; height:78px; border-radius:22px; display:grid; place-items:center; margin:0 auto 30px;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b)); box-shadow:0 26px 60px -18px rgba(123,108,246,.55);}
+  #surface .mark img{height:38px; display:block;}
+  #surface{ text-align:center; }
+  #surface .wrap{display:flex; flex-direction:column; align-items:center;}
+  .cue{position:absolute; bottom:30px; inset-inline:0; text-align:center; color:var(--muted); font-size:12.5px; z-index:3;}
+  .cue .arr{display:block; margin:10px auto 0; width:20px; height:20px; border-inline-start:2px solid var(--violet-2); border-bottom:2px solid var(--violet-2); transform:rotate(-45deg); animation:bob 1.7s infinite;}
+  @keyframes bob{0%,100%{transform:rotate(-45deg) translate(0,0); opacity:.4;} 50%{transform:rotate(-45deg) translate(-3px,3px); opacity:1;}}
+
+  /* ---------- DESCENT (noise sinking) ---------- */
+  #descent{ text-align:center; }
+  #descent .wrap{display:flex; flex-direction:column; align-items:center;}
+  .noise{position:relative; width:100%; max-width:640px; height:200px; margin:6px auto 30px;}
+  .frag{position:absolute; display:inline-flex; align-items:center; gap:7px; padding:9px 15px; border-radius:14px; font-size:13.5px; color:var(--ink-soft);
+    background:#fff; border:1px solid var(--line); box-shadow:0 12px 30px -16px rgba(20,18,40,.25); white-space:nowrap;
+    transition:transform 1.1s cubic-bezier(.4,.6,.2,1), opacity 1.1s;}
+  #descent.sunk .frag{transform:translateY(120px) scale(.7); opacity:0;}
+
+  /* ---------- generic two-column layout ---------- */
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:54px; align-items:center;}
+  .duo .stage{position:relative;}
+
+  /* primary buttons */
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:9px; cursor:pointer; border:none;
+    font-family:inherit; font-size:15px; font-weight:600; padding:14px 26px; border-radius:999px; color:#fff;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); box-shadow:0 16px 36px -14px rgba(123,108,246,.6); transition:transform .25s, box-shadow .25s, opacity .25s;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn[disabled]{cursor:default; opacity:.9;}
+  .btn.ghost{background:transparent; color:var(--violet); box-shadow:none; border:1px solid rgba(108,92,231,.3);}
+  .pill{display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:500; color:var(--ink-soft);
+    padding:8px 14px; border-radius:999px; background:#fff; border:1px solid var(--line);}
+
+  /* ---------- AUDIENCE: gather ---------- */
+  .gather{position:relative; height:330px; border-radius:26px; background:radial-gradient(120% 120% at 50% 30%, #fff, var(--paper));
+    border:1px solid var(--line); overflow:hidden;}
+  .gather .core{position:absolute; inset-inline-start:50%; top:50%; transform:translate(-50%,-50%); z-index:3;
+    width:62px; height:62px; border-radius:18px; display:grid; place-items:center; opacity:0; transition:opacity .6s .3s;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b)); box-shadow:0 16px 36px -12px rgba(123,108,246,.6);}
+  .gather .core img{height:30px;}
+  .gather.gathered .core{opacity:1;}
+  .av{position:absolute; width:34px; height:34px; border-radius:50%; z-index:2; transform:translate(-50%,-50%);
+    background:linear-gradient(140deg,#c9c3f6,#efb9d6); border:2px solid #fff; box-shadow:0 6px 16px -6px rgba(20,18,40,.3);
+    transition:left .85s cubic-bezier(.2,.7,.2,1), top .85s cubic-bezier(.2,.7,.2,1);}
+  .gather .count{position:absolute; inset-inline:0; bottom:16px; text-align:center; font-size:13.5px; font-weight:600; color:var(--violet);
+    opacity:0; transform:translateY(8px); transition:opacity .5s, transform .5s;}
+  .gather.gathered .count{opacity:1; transform:none;}
+
+  /* ---------- MESSAGE: composer + targets ---------- */
+  .composer{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:20px; box-shadow:0 24px 50px -30px rgba(20,18,40,.3);}
+  .chs{display:flex; gap:8px; margin-bottom:14px;}
+  .ch{flex:1; display:flex; align-items:center; justify-content:center; gap:8px; cursor:pointer; font-size:13.5px; font-weight:600;
+    padding:11px; border-radius:13px; border:1.5px solid var(--line); background:#fff; color:var(--muted); transition:.25s;}
+  .ch.on{border-color:transparent; color:#fff;}
+  .ch.wa.on{background:linear-gradient(135deg,#1faa59,#22c79a);}
+  .ch.em.on{background:linear-gradient(135deg,var(--grad-a),var(--grad-b));}
+  .msgline{font-size:13.5px; color:var(--ink-soft); background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:12px 14px; line-height:1.6; margin-bottom:14px;}
+  .targets{display:flex; gap:14px; align-items:stretch; margin-top:4px;}
+  .phone{flex:1; background:#0f1a14; border-radius:18px; padding:12px; min-height:150px; border:1px solid #1c2b22; transition:box-shadow .4s, transform .4s; position:relative;}
+  .phone .top{font-size:10px; color:#22c79a; margin-bottom:9px;}
+  .bub{background:#173a2a; color:#dff5ea; font-size:11.5px; border-radius:12px; padding:8px 11px; line-height:1.5; max-width:90%;}
+  .inbox{flex:1; background:#fff; border:1px solid var(--line); border-radius:18px; padding:13px; min-height:150px; transition:box-shadow .4s, transform .4s;}
+  .inbox .top{font-size:10px; color:var(--violet); margin-bottom:9px;}
+  .inbox .sub{font-size:12.5px; font-weight:600; color:var(--ink); margin-bottom:5px;}
+  .inbox .pre{font-size:11px; color:var(--muted); line-height:1.6;}
+  .target.dim{opacity:.45; filter:grayscale(.4);}
+  .target.lit{box-shadow:0 0 0 2px var(--violet), 0 22px 44px -22px rgba(108,92,231,.5);}
+  .deliver{display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:var(--green); margin-top:9px; opacity:0; transform:translateY(6px); transition:.4s;}
+  .deliver.show{opacity:1; transform:none;}
+  .flydot{position:fixed; width:16px; height:16px; border-radius:50%; z-index:90; pointer-events:none;
+    background:linear-gradient(135deg,var(--grad-a),var(--grad-b)); box-shadow:0 0 14px rgba(123,108,246,.7);
+    transition:transform .62s cubic-bezier(.4,.8,.2,1), opacity .62s;}
+  .stat-rise{display:inline-flex; align-items:baseline; gap:8px; margin-top:18px; opacity:0; transform:translateY(8px); transition:.5s;}
+  .stat-rise.show{opacity:1; transform:none;}
+  .stat-rise b{font-size:30px; font-weight:700;} .stat-rise span{font-size:13px; color:var(--muted);}
+
+  /* ---------- EVENT: lifecycle ---------- */
+  .lifecol{display:flex; flex-direction:column; gap:14px;}
+  .ev-card{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:18px;
+    opacity:0; transform:translateY(16px) scale(.97); transition:opacity .55s cubic-bezier(.2,.7,.2,1), transform .55s cubic-bezier(.2,.7,.2,1);}
+  .ev-card.show{opacity:1; transform:none;}
+  .ticket{display:flex; gap:16px; align-items:center;}
+  .qr{width:84px; height:84px; flex-shrink:0; border-radius:10px; padding:6px; background:#fff; border:1px solid var(--line);
+    display:grid; grid-template-columns:repeat(11,1fr); grid-template-rows:repeat(11,1fr); gap:0;}
+  .qr i{background:transparent;} .qr i.on{background:var(--ink);}
+  .ticket .ti b{font-size:15px; font-weight:600; display:block; margin-bottom:3px;}
+  .ticket .ti span{font-size:12.5px; color:var(--muted);}
+  .ticket .seat{margin-top:7px; font-size:12px; font-weight:600; color:var(--violet);}
+  .rmd{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--ink-soft);}
+  .rmd .ic{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:rgba(246,185,72,.16); flex-shrink:0;}
+  .cert{display:flex; align-items:center; gap:14px; background:linear-gradient(135deg,#fff,#f7f4ff);}
+  .cert .seal{width:48px; height:48px; border-radius:50%; flex-shrink:0; display:grid; place-items:center; color:#fff; font-size:22px;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b)); box-shadow:0 10px 24px -10px rgba(123,108,246,.6);}
+  .cert b{font-size:15px; font-weight:600; display:block;} .cert span{font-size:12px; color:var(--muted);}
+
+  /* ---------- IMPACT: counters + ring ---------- */
+  .metrics{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:8px;}
+  .metric{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:24px 18px; text-align:center;}
+  .metric .v{font-size:clamp(30px,5vw,46px); font-weight:700; letter-spacing:-1px; line-height:1;
+    background:linear-gradient(120deg,var(--grad-a),var(--grad-b)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  .metric .l{font-size:12.5px; color:var(--muted); margin-top:9px;}
+  .ring-wrap{display:grid; place-items:center;}
+  .ring{transform:rotate(-90deg);}
+  .ring .bg{fill:none; stroke:var(--line); stroke-width:10;}
+  .ring .fg{fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; stroke-dasharray:534; stroke-dashoffset:534; transition:stroke-dashoffset 1.6s cubic-bezier(.2,.7,.2,1);}
+  .ring-wrap .mid{position:absolute; text-align:center;}
+  .ring-wrap .mid b{font-size:30px; font-weight:700;} .ring-wrap .mid span{display:block; font-size:11.5px; color:var(--muted); margin-top:2px;}
+
+  /* ---------- CORE ---------- */
+  #core{text-align:center;}
+  #core .wrap{display:flex; flex-direction:column; align-items:center;}
+  #core .mark{width:96px; height:96px; border-radius:28px; display:grid; place-items:center; margin:0 auto 30px;
+    background:linear-gradient(140deg,var(--grad-a),var(--grad-b)); box-shadow:0 30px 80px -20px rgba(123,108,246,.6);
+    animation:breathe 5s ease-in-out infinite;}
+  #core .mark img{height:46px;}
+  @keyframes breathe{0%,100%{transform:scale(1);} 50%{transform:scale(1.05);}}
+  .pat{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:26px;}
+  .pat span{font-size:14px; font-weight:600; padding:11px 22px; border-radius:999px; background:#fff; border:1px solid var(--line); color:var(--ink-soft);}
+
+  /* ---------- FINALE ---------- */
+  #finale{text-align:center; background:radial-gradient(120% 80% at 50% 0%, rgba(123,108,246,.08), transparent 60%);}
+  #finale .wrap{display:flex; flex-direction:column; align-items:center;}
+  .ctarow{display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center; margin-top:30px;}
+  .chips{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:26px;}
+  .founder{margin-top:40px; font-size:14.5px; color:var(--ink-soft); line-height:1.8; max-width:560px;}
+  .signoff{margin-top:18px; font-size:12.5px; color:var(--muted);}
+
+  /* ---------- responsive ---------- */
+  @media(max-width:820px){
+    #rail{display:none;}
+    #topbar{display:flex;}
+    #brand{display:none;}
+    .scene{padding:11vh 0; min-height:auto;}
+    #surface, #descent, #core, #finale{min-height:92svh;}
+    .wrap{padding:0 20px;}
+    .duo{grid-template-columns:1fr; gap:30px;}
+    .duo .copy{order:1;} .duo .stage{order:2;}
+    .lede{font-size:16px;}
+    .metrics{gap:10px;}
+    .metric{padding:18px 10px;}
+    .gather{height:300px;}
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; scroll-behavior:auto !important;}
+    .rv{opacity:1 !important; transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- depth rail (desktop) -->
+<nav id="rail" aria-label="مؤشّر العمق">
+  <span class="fill"></span>
+  <a class="stop" data-target="surface"><i></i><b>السطح</b></a>
+  <a class="stop" data-target="audience"><i></i><b>الجمهور</b></a>
+  <a class="stop" data-target="message"><i></i><b>الرسالة</b></a>
+  <a class="stop" data-target="event"><i></i><b>الفعالية</b></a>
+  <a class="stop" data-target="impact"><i></i><b>الأثر</b></a>
+  <a class="stop" data-target="core"><i></i><b>المركز</b></a>
+</nav>
+
+<!-- depth bar (mobile) -->
+<div id="topbar">
+  <img class="mk" src="project/assets/mhwar-mark.svg" alt="محور">
+  <div class="track"><span class="pf"></span></div>
+  <span class="lbl">السطح</span>
+</div>
+
+<div id="brand"><img src="project/assets/mhwar-mark.svg" alt="محور"></div>
+
+<!-- ============ 0 · SURFACE ============ -->
+<section class="scene" id="surface" data-depth="السطح">
+  <div class="glow" style="width:60vmax;height:60vmax;background:radial-gradient(circle,rgba(123,108,246,.18),transparent 65%);top:-20vmax;inset-inline-end:-15vmax;"></div>
+  <div class="glow" style="width:48vmax;height:48vmax;background:radial-gradient(circle,rgba(232,121,185,.14),transparent 65%);bottom:-18vmax;inset-inline-start:-12vmax;"></div>
+  <div class="wrap">
+    <div class="mark rv in"><img src="project/assets/mhwar-mark.svg" alt="محور"></div>
+    <div class="kicker rv in d1">محور · النسخة التفاعلية</div>
+    <h1 class="display rv in d2">كلّ مجتمعٍ له مركز.<br><span class="grad">تدور حوله الحكاية.</span></h1>
+    <p class="lede rv in d3" style="margin:26px auto 0; text-align:center">انزل معنا — طبقةً تلو طبقة — إلى عُمق محور.</p>
+  </div>
+  <div class="cue rv in d4">انزل<span class="arr"></span></div>
+</section>
+
+<!-- ============ 1 · DESCENT ============ -->
+<section class="scene" id="descent">
+  <div class="wrap">
+    <div class="noise" id="noise">
+      <div class="frag" style="top:6%; inset-inline-start:4%">💬 قروبٌ آخر</div>
+      <div class="frag" style="top:20%; inset-inline-end:6%">📄 إكسل لا ينتهي</div>
+      <div class="frag" style="top:54%; inset-inline-start:10%">📧 إيميلٌ ضاع</div>
+      <div class="frag" style="top:64%; inset-inline-end:12%">🔕 رسالةٌ متأخّرة</div>
+      <div class="frag" style="top:38%; inset-inline-start:44%">🤔 من سجّل؟</div>
+    </div>
+    <h2 class="big rv" style="text-align:center; margin:0 auto">على السطح، <span style="color:var(--muted)">ضجيجٌ لا يهدأ.</span></h2>
+    <p class="lede rv d2" style="margin:20px auto 0; text-align:center">وفي العُمق… يصير كلُّ شيءٍ في مكانه.</p>
+  </div>
+</section>
+
+<!-- ============ 2 · AUDIENCE ============ -->
+<section class="scene" id="audience" data-depth="الجمهور">
+  <div class="glow" style="width:46vmax;height:46vmax;background:radial-gradient(circle,rgba(123,108,246,.12),transparent 65%);top:-10vmax;inset-inline-start:-14vmax;"></div>
+  <div class="wrap">
+    <div class="duo">
+      <div class="copy">
+        <span class="label rv"><span class="n">٠١</span> الطبقة الأولى · جمهورك</span>
+        <h2 class="big rv d1">اجمعهم في مكانٍ <span class="grad">تملكه.</span></h2>
+        <p class="lede rv d2" style="margin:20px 0 0">لا قائمةَ بريدٍ باردة. مجتمعٌ حيّ، أنت محوره — تعرف أعضاءه، وتصل إليهم متى شئت.</p>
+        <button class="btn rv d3" id="gatherBtn" style="margin-top:26px">اجمعهم ✦</button>
+      </div>
+      <div class="stage rv d2">
+        <div class="gather" id="gather">
+          <div class="core"><img src="project/assets/mhwar-mark.svg" alt="محور"></div>
+          <div class="count" id="gatherCount">٣١٢ عضواً، في مكانٍ واحد.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 · MESSAGE ============ -->
+<section class="scene" id="message" data-depth="الرسالة">
+  <div class="glow" style="width:44vmax;height:44vmax;background:radial-gradient(circle,rgba(34,199,154,.10),transparent 65%);bottom:-12vmax;inset-inline-end:-12vmax;"></div>
+  <div class="wrap">
+    <div class="duo">
+      <div class="stage rv d2">
+        <div class="composer" id="composer">
+          <div class="chs">
+            <button class="ch wa on" data-ch="wa">واتساب</button>
+            <button class="ch em" data-ch="em">البريد</button>
+          </div>
+          <div class="msgline">تذكير: ملتقاكم غداً الساعة ٧ مساءً 🔔</div>
+          <button class="btn" id="sendBtn" style="width:100%">أرسل الآن</button>
+          <div class="targets">
+            <div class="phone target lit" id="waPhone">
+              <div class="top">● واتساب</div>
+              <div class="bub">تذكير: ملتقاكم غداً ٧م 🔔</div>
+              <div class="deliver" id="waDeliver">✓ تم التوصيل · فُتحت خلال ثوانٍ</div>
+            </div>
+            <div class="inbox target dim" id="mailCard">
+              <div class="top">✉ البريد</div>
+              <div class="sub">تذكير بالملتقى</div>
+              <div class="pre">نراكم غداً في تمام السابعة…</div>
+              <div class="deliver" id="emDeliver">✓ وصلت إلى البريد الوارد</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copy">
+        <span class="label rv"><span class="n">٠٢</span> الطبقة الثانية · رسالتك</span>
+        <h2 class="big rv d1">لكل رسالة… <span class="grad">قناتها الصحيحة.</span></h2>
+        <p class="lede rv d2" style="margin:20px 0 0">واتساب يصل ويُقرأ في ثوانٍ. البريد يروي ويوثّق. ومن لوحةٍ واحدة، تختار القناة وتُرسل.</p>
+        <div class="stat-rise" id="msgStat"><b class="grad">٩٠٪+</b><span>معدّل فتح واتساب في السوق العربي</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 · EVENT ============ -->
+<section class="scene" id="event" data-depth="الفعالية">
+  <div class="glow" style="width:46vmax;height:46vmax;background:radial-gradient(circle,rgba(246,185,72,.10),transparent 65%);top:-12vmax;inset-inline-start:-12vmax;"></div>
+  <div class="wrap">
+    <div class="duo">
+      <div class="copy">
+        <span class="label rv"><span class="n">٠٣</span> الطبقة الثالثة · فعاليتك</span>
+        <h2 class="big rv d1">من الدعوة… <span class="grad">إلى الشهادة.</span></h2>
+        <p class="lede rv d2" style="margin:20px 0 0">دورةٌ كاملة تبدأ بنقرة: تأكيد حضور، تذكرة بِرمز QR، تذكيرٌ آليّ، ثم شهادةٌ موثّقة — بهويتك أنت.</p>
+        <button class="btn rv d3" id="rsvpBtn" style="margin-top:26px">أكّد حضورك</button>
+      </div>
+      <div class="stage rv d2">
+        <div class="lifecol">
+          <div class="ev-card" id="evTicket">
+            <div class="ticket">
+              <div class="qr" id="qr"></div>
+              <div class="ti"><b>تذكرتك جاهزة</b><span>ملتقى المجتمع · القاعة الكبرى</span><div class="seat">المقعد A-12</div></div>
+            </div>
+          </div>
+          <div class="ev-card" id="evReminder">
+            <div class="rmd"><span class="ic">⏰</span><div>ذكّرناك تلقائياً قبل الموعد بساعتين.</div></div>
+          </div>
+          <div class="ev-card cert" id="evCert">
+            <span class="seal">🏅</span>
+            <div><b>شهادة حضور · موثّقة ✓</b><span>برمز تحقّق فريد، جاهزة للتحميل والمشاركة</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · IMPACT ============ -->
+<section class="scene" id="impact" data-depth="الأثر">
+  <div class="glow" style="width:50vmax;height:50vmax;background:radial-gradient(circle,rgba(232,121,185,.12),transparent 65%);bottom:-16vmax;inset-inline-start:-10vmax;"></div>
+  <div class="wrap">
+    <div class="duo">
+      <div class="copy">
+        <span class="label rv"><span class="n">٠٤</span> الطبقة الرابعة · أثرك</span>
+        <h2 class="big rv d1">كل رسالة… <span class="grad">تُنبت العضو التالي.</span></h2>
+        <p class="lede rv d2" style="margin:20px 0 0">المحتوى يُبقي الناس، التفاعل يجذب غيرهم، وأعضاءٌ جدد يبدؤون الدورة. دائرتك تكبر… من تلقاء نفسها.</p>
+        <div class="metrics rv d3">
+          <div class="metric"><div class="v" data-count="87" data-suffix="٪">٠</div><div class="l">فتح النشرة</div></div>
+          <div class="metric"><div class="v" data-count="310" data-prefix="+">٠</div><div class="l">عضو هذا الشهر</div></div>
+          <div class="metric"><div class="v" data-count="3" data-prefix="×">٠</div><div class="l">نمو خلال ٦ أشهر</div></div>
+        </div>
+      </div>
+      <div class="stage rv d2">
+        <div class="ring-wrap" style="position:relative">
+          <svg class="ring" width="200" height="200" viewBox="0 0 200 200">
+            <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b6cf6"/><stop offset="1" stop-color="#e879b9"/></linearGradient></defs>
+            <circle class="bg" cx="100" cy="100" r="85"/>
+            <circle class="fg" id="ringFg" cx="100" cy="100" r="85"/>
+          </svg>
+          <div class="mid"><b class="grad">×٣</b><span>نموّ الدائرة</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 · CORE ============ -->
+<section class="scene" id="core" data-depth="المركز">
+  <div class="glow" style="width:64vmax;height:64vmax;background:radial-gradient(circle,rgba(123,108,246,.16),transparent 62%);top:50%;inset-inline-start:50%;transform:translate(-50%,-50%);"></div>
+  <div class="wrap">
+    <div class="mark rv"><img src="project/assets/mhwar-mark.svg" alt="محور"></div>
+    <div class="kicker rv d1">وصلت</div>
+    <h2 class="display rv d2" style="font-size:clamp(36px,7vw,80px)">هنا المركز.<br><span class="grad">هنا محور.</span></h2>
+    <p class="lede rv d3" style="margin:22px auto 0; text-align:center">كلُّ ما نزلت خلاله — جمهورك، رسالتك، فعاليتك، أثرك — يدور حول نقطةٍ واحدة تملكها أنت.</p>
+    <div class="pat rv d4">
+      <span>مفتوح</span><span>مغلق</span><span>هجين</span>
+    </div>
+    <p class="rv d4" style="margin-top:16px; font-size:13.5px; color:var(--muted)">اختر نمطك، ويعمل فوراً.</p>
+  </div>
+</section>
+
+<!-- ============ 7 · FINALE ============ -->
+<section class="scene" id="finale">
+  <div class="wrap">
+    <div class="kicker rv">والآن دورك</div>
+    <h2 class="big rv d1">ابدأ محورك <span class="grad">خلال دقائق.</span></h2>
+    <p class="lede rv d2" style="margin:20px auto 0; text-align:center">بياناتك ملكك. بلا تعقيد. فقط… ابدأ.</p>
+    <div class="ctarow rv d3">
+      <a class="btn" href="https://mhwar.com/c/mhwar1" target="_blank" rel="noopener">ابدأ مجاناً ←</a>
+      <a class="btn ghost" href="index.html">شاهد القصة الكاملة</a>
+    </div>
+    <div class="chips rv d4">
+      <span class="pill">🔒 بياناتك ملكك</span>
+      <span class="pill">✕ بدون بطاقة ائتمان</span>
+      <span class="pill">🎁 ١٤ يوماً مجاناً</span>
+    </div>
+    <p class="founder rv d4">بنيت محور ليكون المركز الذي تتحوّل حوله المجتمعات إلى أثرٍ حقيقي. 🤍</p>
+    <p class="signoff rv d4">محور · Mhwar — ٢٠٢٦</p>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const toAr = n => String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+
+  /* ---------- reveal on scroll ---------- */
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:.16});
+  $$('.rv:not(.in)').forEach(el => io.observe(el));
+
+  /* ---------- depth rail + progress ---------- */
+  const stops = $$('#rail .stop');
+  const fill = $('#rail .fill');
+  const railH = () => { const f=$('#rail'); return f ? f.getBoundingClientRect().height - 12 : 0; };
+  const pf = $('#topbar .pf'), lbl = $('#topbar .lbl');
+  const scenesWithDepth = $$('.scene[data-depth]');
+  const brand = $('#brand');
+
+  stops.forEach(s => s.addEventListener('click', () => {
+    const t = document.getElementById(s.dataset.target);
+    if(t) t.scrollIntoView({behavior: reduce ? 'auto' : 'smooth'});
+  }));
+
+  let ticking = false;
+  function onScroll(){
+    const doc = document.documentElement;
+    const prog = Math.min(1, scrollY / (doc.scrollHeight - innerHeight || 1));
+    if(pf) pf.style.width = (prog*100) + '%';
+    if(brand) brand.classList.toggle('show', scrollY > innerHeight*0.7);
+
+    // active depth = last scene whose top has passed the viewport middle
+    let active = 0;
+    scenesWithDepth.forEach((sc, i) => { if(sc.getBoundingClientRect().top < innerHeight*0.5) active = i; });
+    stops.forEach((s, i) => s.classList.toggle('on', i <= active));
+    if(fill) fill.style.height = (active/(stops.length-1)) * railH() + 'px';
+    if(lbl) lbl.textContent = scenesWithDepth[active].dataset.depth;
+
+    // gentle parallax on glows
+    if(!reduce){
+      $$('.glow').forEach((g, i) => {
+        const r = g.parentElement.getBoundingClientRect();
+        const off = (r.top - innerHeight/2) * (0.06 + (i%3)*0.015);
+        g.style.transform = (g.dataset.base||'') + ' translateY(' + (-off) + 'px)';
+      });
+    }
+    ticking = false;
+  }
+  // preserve any centering transform on core glow
+  $$('.glow').forEach(g => { const t=g.style.transform; if(t) g.dataset.base = t; });
+  addEventListener('scroll', () => { if(!ticking){ ticking = true; requestAnimationFrame(onScroll); } }, {passive:true});
+  addEventListener('resize', onScroll);
+
+  /* ---------- helper: run a demo once when a scene is first seen (unless user did it) ---------- */
+  function autoOnce(el, fn, delay){
+    let done = false;
+    const trigger = () => { if(done) return; done = true; fn(); };
+    el._trigger = trigger;
+    if(reduce) return trigger;            // no auto-demo, but tapping still calls _trigger via handlers
+    const ob = new IntersectionObserver(es => es.forEach(e => {
+      if(e.isIntersecting){ setTimeout(() => { if(!done) trigger(); }, delay||1500); ob.disconnect(); }
+    }), {threshold:.55});
+    ob.observe(el);
+    return trigger;
+  }
+
+  /* ---------- 1 · descent: sink the noise ---------- */
+  const descent = $('#descent');
+  new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ setTimeout(()=>descent.classList.add('sunk'), 600); } }), {threshold:.5})
+    .observe(descent);
+
+  /* ---------- 2 · audience: gather avatars into a ring ---------- */
+  (function(){
+    const stage = $('#gather'); if(!stage) return;
+    const N = 14, avs = [];
+    for(let i=0;i<N;i++){
+      const a = document.createElement('span'); a.className = 'av';
+      a.style.left = (12 + Math.random()*76) + '%';
+      a.style.top  = (12 + Math.random()*70) + '%';
+      stage.appendChild(a); avs.push(a);
+    }
+    let gathered = false;
+    function gather(){
+      if(gathered) return; gathered = true;
+      const w = stage.clientWidth, h = stage.clientHeight;
+      const cx = w/2, cy = h/2, R = Math.min(w,h)*0.36;
+      avs.forEach((a,i) => {
+        const ang = (i/N) * Math.PI*2 - Math.PI/2;
+        a.style.left = (cx + Math.cos(ang)*R) + 'px';
+        a.style.top  = (cy + Math.sin(ang)*R) + 'px';
+      });
+      stage.classList.add('gathered');
+    }
+    $('#gatherBtn').addEventListener('click', gather);
+    autoOnce(stage, gather, 1400);
+  })();
+
+  /* ---------- 3 · message: pick channel + send ---------- */
+  (function(){
+    const composer = $('#composer'); if(!composer) return;
+    let ch = 'wa';
+    const wa = $('#waPhone'), em = $('#mailCard');
+    function select(c){
+      ch = c;
+      $$('.ch', composer).forEach(b => b.classList.toggle('on', b.dataset.ch===c));
+      wa.classList.toggle('lit', c==='wa'); wa.classList.toggle('dim', c!=='wa');
+      em.classList.toggle('lit', c==='em'); em.classList.toggle('dim', c!=='em');
+    }
+    $$('.ch', composer).forEach(b => b.addEventListener('click', () => select(b.dataset.ch)));
+
+    let sent = false;
+    function send(){
+      if(sent) return; sent = true;
+      const btn = $('#sendBtn'), target = ch==='wa' ? wa : em;
+      const deliver = ch==='wa' ? $('#waDeliver') : $('#emDeliver');
+      if(!reduce){
+        const a = btn.getBoundingClientRect(), b = target.getBoundingClientRect();
+        const dot = document.createElement('span'); dot.className = 'flydot';
+        dot.style.left = (a.left+a.width/2-8)+'px'; dot.style.top = (a.top+a.height/2-8)+'px';
+        document.body.appendChild(dot);
+        requestAnimationFrame(() => {
+          dot.style.transform = 'translate('+((b.left+b.width/2)-(a.left+a.width/2))+'px,'+((b.top+b.height/2)-(a.top+a.height/2))+'px) scale(.4)';
+          dot.style.opacity = '0';
+        });
+        setTimeout(() => dot.remove(), 700);
+      }
+      btn.textContent = 'تم الإرسال ✓'; btn.setAttribute('disabled','');
+      setTimeout(() => { deliver.classList.add('show'); $('#msgStat').classList.add('show'); }, reduce?0:520);
+    }
+    $('#sendBtn').addEventListener('click', send);
+    autoOnce(composer, send, 1600);
+  })();
+
+  /* ---------- 4 · event: build a QR + reveal lifecycle ---------- */
+  (function(){
+    // deterministic QR-like pattern (11×11) with corner finders
+    const qr = $('#qr'); if(qr){
+      const finder = (r,c) => (r<3&&c<3)||(r<3&&c>7)||(r>7&&c<3);
+      let seed = 7;
+      for(let r=0;r<11;r++) for(let c=0;c<11;c++){
+        const cell = document.createElement('i');
+        let on;
+        if((r===0||r===2||c===0||c===2) && finder(r,c)) on = true;
+        else if(r===1&&c===1) on=false; else if(finder(r,c)) on = (r===1||c===1)?false:true;
+        else { seed = (seed*131 + r*7 + c*13) % 101; on = seed % 2 === 0; }
+        if(on) cell.className = 'on';
+        qr.appendChild(cell);
+      }
+    }
+    const cards = ['#evTicket','#evReminder','#evCert'].map(s => $(s));
+    let ran = false;
+    function run(){
+      if(ran) return; ran = true;
+      const btn = $('#rsvpBtn');
+      btn.textContent = 'تم التأكيد ✓'; btn.setAttribute('disabled','');
+      cards.forEach((c,i) => setTimeout(() => c && c.classList.add('show'), reduce?0:(220 + i*560)));
+    }
+    $('#rsvpBtn').addEventListener('click', run);
+    autoOnce($('#event'), run, 1400);
+  })();
+
+  /* ---------- 5 · impact: count-ups + ring ---------- */
+  (function(){
+    const sec = $('#impact'); if(!sec) return;
+    const nums = $$('[data-count]', sec), ring = $('#ringFg');
+    let ran = false;
+    function run(){
+      if(ran) return; ran = true;
+      if(ring) ring.style.strokeDashoffset = reduce ? '180' : '178';   // ~ two-thirds filled
+      nums.forEach(el => {
+        const target = +el.dataset.count, pre = el.dataset.prefix||'', suf = el.dataset.suffix||'';
+        if(reduce){ el.textContent = pre + toAr(target) + suf; return; }
+        const dur = 1400, t0 = performance.now();
+        (function step(t){
+          const k = Math.min(1, (t-t0)/dur), e = 1-Math.pow(1-k,3);
+          el.textContent = pre + toAr(Math.round(target*e)) + suf;
+          if(k<1) requestAnimationFrame(step);
+        })(t0);
+      });
+    }
+    new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ run(); } }), {threshold:.5}).observe(sec);
+  })();
+
+  onScroll();
+})();
+</script>
+</body>
+</html>
